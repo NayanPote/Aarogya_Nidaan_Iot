@@ -6,7 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
+    android:background="@drawable/logobackground_gradient"
     tools:context=".splashpage">
 
     <!-- First Lottie Animation (Background) -->
@@ -25,18 +25,44 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
+        android:visibility="visible"
         app:lottie_autoPlay="true"
         app:lottie_loop="false"
         app:lottie_rawRes="@raw/lottie2" />
 
     <!-- Centered Logo ImageView -->
-    <ImageView
+    <androidx.cardview.widget.CardView
         android:id="@+id/logo"
-        android:layout_width="190dp"
-        android:layout_height="190dp"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        app:cardCornerRadius="80dp"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/aarogyanidaanlogo" />
+        app:cardElevation="16dp"
+        android:layout_marginTop="10dp">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="20dp"
+            android:src="@drawable/aarogyanidaanlogo"
+            android:background="@drawable/logo_glow_background" />
+
+        <!-- Inner Ripple effect around logo -->
+        <View
+            android:id="@+id/logo_ripple_effect"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/logo_ripple_animation" />
+
+        <!-- Animated background with ripple effect -->
+        <View
+            android:id="@+id/ripple_effect"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/ripple_animation" />
+    </androidx.cardview.widget.CardView>
+
 
     <!-- Centered Title TextView -->
     <TextView
@@ -46,8 +72,9 @@
         android:layout_below="@id/logo"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
-        android:text="Aarogya Nidaan"
-        android:textColor="#FFFFFF"
+        android:text="@string/app_name"
+        android:fontFamily="@font/latobold"
+        android:textColor="@color/white"
         android:textSize="30sp"
         android:textStyle="bold" />
 
@@ -59,8 +86,8 @@
         android:layout_below="@id/appname"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="5dp"
-        android:text="True Diagnosis for wellness"
-        android:textColor="#A4E259"
+        android:text="'' True Diagnosis for wellness ''"
+        android:textColor="#EBE5E5"
         android:textSize="20sp"
         android:textStyle="italic" />
 
@@ -83,8 +110,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:indicatorColor="#7DB4FA"
-        app:trackColor="@color/gray"
+        app:indicatorColor="#FFFFFF"
+        app:trackColor="#8A5E5E"
         android:layout_above="@+id/copyright"
         android:layout_marginBottom="30dp"
         style="@style/Widget.MaterialComponents.LinearProgressIndicator"

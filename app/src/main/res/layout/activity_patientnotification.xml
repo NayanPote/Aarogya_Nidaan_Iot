@@ -13,14 +13,13 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/primary"
+        android:background="@color/background_light"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:titleTextColor="@color/white">
+            android:layout_height="?attr/actionBarSize">
 
             <!-- Back Button Inside Toolbar -->
             <ImageButton
@@ -30,14 +29,15 @@
                 android:layout_marginStart="12dp"
                 android:src="@drawable/back"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="10dp"/>
+                android:padding="10dp"
+                app:tint="@color/main_dark" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="Notifications"
                 android:textSize="20sp"
-                android:textColor="@color/white"
+                android:textColor="@color/main_dark"
                 android:textAlignment="center"
                 android:gravity="center"/>
 
@@ -49,7 +49,7 @@
                 android:layout_marginEnd="20dp"
                 android:src="@drawable/settings"
                 android:background="@color/transparent"
-                app:tint="@color/white" />
+                app:tint="@color/main_dark" />
 
         </androidx.appcompat.widget.Toolbar>
 

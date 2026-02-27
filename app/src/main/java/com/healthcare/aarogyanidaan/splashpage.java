@@ -8,8 +8,6 @@ import android.os.Handler;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -19,31 +17,30 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.airbnb.lottie.LottieAnimationView;
-import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.healthcare.aarogyanidaan.databinding.ActivitySplashpageBinding;
 
 public class splashpage extends AppCompatActivity {
 
     private static final String SHARED_PREFS = "sharedPrefs";
     private FirebaseAuth auth;
     private FirebaseDatabase database;
-    private TextView copyright;
-    private ImageView logo;
-    private TextView appname, tagline;
+    private ActivitySplashpageBinding binding;
     private Animation topAnim, bottomAnim;
+    private ValueAnimator progressAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_splashpage);
 
-
+        // Initialize View Binding
+        binding = ActivitySplashpageBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         initializeUI();
         setupAnimations();
@@ -54,43 +51,56 @@ public class splashpage extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
 
-        copyright = findViewById(R.id.copyright);
-        logo = findViewById(R.id.logo);
-        appname = findViewById(R.id.appname);
-        tagline = findViewById(R.id.tagline);
-        LinearProgressIndicator progressIndicator = findViewById(R.id.progress_indicator);
-        // Progress indicator animation
-        progressIndicator.setAlpha(0f);
-        progressIndicator.setProgress(0);
-        progressIndicator.animate()
-                .alpha(1f)
-                .setStartDelay(900)
-                .setDuration(600)
-                .start();
+        // Null check for binding
+        if (binding == null) return;
 
-        // Animate progress
-        ValueAnimator progressAnimation = ValueAnimator.ofInt(0, 100);
-        progressAnimation.setDuration(2000);
-        progressAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
-        progressAnimation.addUpdateListener(animation ->
-                progressIndicator.setProgress((int) animation.getAnimatedValue()));
-        progressAnimation.setStartDelay(1000);
-        progressAnimation.start();
+        // Progress indicator animation with null checks
+        if (binding.progressIndicator != null) {
+            binding.progressIndicator.setAlpha(0f);
+            binding.progressIndicator.setProgress(0);
+            binding.progressIndicator.animate()
+                    .alpha(1f)
+                    .setStartDelay(900)
+                    .setDuration(600)
+                    .start();
 
-        LottieAnimationView lottieAnimationView = findViewById(R.id.lottie_animation);
-        lottieAnimationView.playAnimation();
+            // Animate progress with null checks in callback
+            progressAnimation = ValueAnimator.ofInt(0, 100);
+            progressAnimation.setDuration(2000);
+            progressAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
+            progressAnimation.addUpdateListener(animation -> {
+                // Add null checks to prevent crash
+                if (binding != null && binding.progressIndicator != null && !isFinishing()) {
+                    binding.progressIndicator.setProgress((int) animation.getAnimatedValue());
+                }
+            });
+            progressAnimation.setStartDelay(1000);
+            progressAnimation.start();
+        }
+
+        // Start Lottie animation with null check
+        if (binding.lottieAnimation != null) {
+            binding.lottieAnimation.playAnimation();
+        }
     }
 
     private void setupAnimations() {
+        if (binding == null) return;
+
         topAnim = AnimationUtils.loadAnimation(this, R.anim.top_animation);
         bottomAnim = AnimationUtils.loadAnimation(this, R.anim.bottom_animation);
-        copyright.setAnimation(bottomAnim);
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        if (binding.copyright != null) {
+            binding.copyright.setAnimation(bottomAnim);
+        }
+
+        if (binding.main != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
+                Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+                return insets;
+            });
+        }
     }
 
     private void checkAuthState() {
@@ -98,25 +108,30 @@ public class splashpage extends AppCompatActivity {
         boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
 
         new Handler().postDelayed(() -> {
+            // Check if activity is still valid
+            if (isFinishing() || isDestroyed()) return;
+
             if (isLoggedIn && auth.getCurrentUser() != null) {
                 String userId = auth.getCurrentUser().getUid();
                 checkUserTypeAndRedirect(userId);
             } else {
-                startActivity(new Intent(splashpage.this, loginpage.class));
-                finish();
+                navigateToLogin();
             }
         }, 2000); // Show splash screen for 2 seconds
     }
 
     private void checkUserTypeAndRedirect(String userId) {
+        if (isFinishing() || isDestroyed()) return;
+
         // First check if user is an admin
         database.getReference("Admin").child(userId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (isFinishing() || isDestroyed()) return;
+
                         if (snapshot.exists()) {
-                            startActivity(new Intent(splashpage.this, Admin.class));
-                            finish();
+                            navigateToActivity(Admin.class);
                         } else {
                             // If not admin, check if patient
                             checkInPatientBranch(userId);
@@ -125,6 +140,8 @@ public class splashpage extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
+                        if (isFinishing() || isDestroyed()) return;
+
                         Toast.makeText(getApplicationContext(), "Database Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                         redirectToLogin();
                     }
@@ -132,13 +149,16 @@ public class splashpage extends AppCompatActivity {
     }
 
     private void checkInPatientBranch(String userId) {
+        if (isFinishing() || isDestroyed()) return;
+
         database.getReference("patient").child(userId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (isFinishing() || isDestroyed()) return;
+
                         if (snapshot.exists()) {
-                            startActivity(new Intent(splashpage.this, patientdashboard.class));
-                            finish();
+                            navigateToActivity(patientdashboard.class);
                         } else {
                             checkInDoctorsBranch(userId);
                         }
@@ -146,6 +166,8 @@ public class splashpage extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
+                        if (isFinishing() || isDestroyed()) return;
+
                         Toast.makeText(getApplicationContext(), "Database Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                         redirectToLogin();
                     }
@@ -153,13 +175,16 @@ public class splashpage extends AppCompatActivity {
     }
 
     private void checkInDoctorsBranch(String userId) {
+        if (isFinishing() || isDestroyed()) return;
+
         database.getReference("doctor").child(userId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (isFinishing() || isDestroyed()) return;
+
                         if (snapshot.exists()) {
-                            startActivity(new Intent(splashpage.this, doctordashboard.class));
-                            finish();
+                            navigateToActivity(doctordashboard.class);
                         } else {
                             Toast.makeText(getApplicationContext(), "User not found in database", Toast.LENGTH_SHORT).show();
                             auth.signOut();
@@ -169,10 +194,26 @@ public class splashpage extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
+                        if (isFinishing() || isDestroyed()) return;
+
                         Toast.makeText(getApplicationContext(), "Database Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                         redirectToLogin();
                     }
                 });
+    }
+
+    private void navigateToActivity(Class<?> activityClass) {
+        if (isFinishing() || isDestroyed()) return;
+
+        startActivity(new Intent(splashpage.this, activityClass));
+        finish();
+    }
+
+    private void navigateToLogin() {
+        if (isFinishing() || isDestroyed()) return;
+
+        startActivity(new Intent(splashpage.this, loginpage.class));
+        finish();
     }
 
     private void redirectToLogin() {
@@ -180,7 +221,20 @@ public class splashpage extends AppCompatActivity {
         editor.putBoolean("isLoggedIn", false);
         editor.apply();
 
-        startActivity(new Intent(splashpage.this, loginpage.class));
-        finish();
+        navigateToLogin();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Cancel progress animation to prevent callback execution
+        if (progressAnimation != null) {
+            progressAnimation.cancel();
+            progressAnimation = null;
+        }
+
+        // Clean up binding to prevent memory leaks
+        binding = null;
     }
 }

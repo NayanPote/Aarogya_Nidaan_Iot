@@ -13,6 +13,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.healthcare.aarogyanidaan.databinding.ActivityDoctorslistBinding;
 
@@ -82,12 +84,13 @@ public class Doctorslist extends AppCompatActivity {
                     }
                 }
 
-                // Update the doctor count
-                updateDoctorCount(doctorList.size());
-
-                // Initially show all doctors in the filtered list
+                // Initially, show all doctors in the filtered list
                 filteredList.clear();
                 filteredList.addAll(doctorList);
+
+                // Update counts for all doctors
+                updateCounts(filteredList);
+
                 updateUI();
             }
 
@@ -95,7 +98,12 @@ public class Doctorslist extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
                 showLoading(false);
                 binding.doccount.setText("0");
+                binding.citycount.setText("0");
+                binding.specialistcount.setText("0");
+
                 binding.doccount.setVisibility(View.VISIBLE);
+                binding.citycount.setVisibility(View.VISIBLE);
+                binding.specialistcount.setVisibility(View.VISIBLE);
 
                 binding.emptyView.setVisibility(View.VISIBLE);
                 binding.topdoctorlist.setVisibility(View.GONE);
@@ -103,10 +111,35 @@ public class Doctorslist extends AppCompatActivity {
         });
     }
 
-    private void updateDoctorCount(int count) {
-        String countText = count + (count != 1 ? "+" : "");
-        binding.doccount.setText(countText);
+    // Update doctor count + city count + specialization count
+    private void updateCounts(ArrayList<Users> doctors) {
+        int doctorCount = doctors.size();
+
+        Set<String> citySet = new HashSet<>();
+        Set<String> specializationSet = new HashSet<>();
+
+        for (Users doctor : doctors) {
+            if (doctor.getDoctor_city() != null && !doctor.getDoctor_city().isEmpty()) {
+                citySet.add(doctor.getDoctor_city());
+            }
+            if (doctor.getDoctor_specialization() != null && !doctor.getDoctor_specialization().isEmpty()) {
+                specializationSet.add(doctor.getDoctor_specialization());
+            }
+        }
+
+        // Doctor count (adding "+" if more than 1)
+//        String docCountText = doctorCount + (doctorCount != 1 ? "+" : "");
+        String docCountText = String.valueOf(doctorCount);
+        binding.doccount.setText(docCountText);
         binding.doccount.setVisibility(View.VISIBLE);
+
+        // City count (number of unique cities)
+        binding.citycount.setText(String.valueOf(citySet.size()));
+        binding.citycount.setVisibility(View.VISIBLE);
+
+        // Specialization count (unique specialties)
+        binding.specialistcount.setText(String.valueOf(specializationSet.size()));
+        binding.specialistcount.setVisibility(View.VISIBLE);
     }
 
     private void setupSearchBar() {
@@ -128,6 +161,8 @@ public class Doctorslist extends AppCompatActivity {
     // Search includes doctor name, specialization, and city
     private void filterBySearchText(String query) {
         ArrayList<Users> searchResults = new ArrayList<>();
+        String lowerCaseQuery = query.toLowerCase();
+
         if (query.isEmpty()) {
             // If no search text, show all doctors or apply just the specialty filter
             applySpecialtyFilter();
@@ -137,12 +172,12 @@ public class Doctorslist extends AppCompatActivity {
             boolean filterBySpecialty = !selectedSpecialty.equals("All");
 
             for (Users doctor : doctorList) {
-                boolean matchesSearch = doctor.getDoctor_name().toLowerCase().contains(query.toLowerCase()) ||
-                        doctor.getDoctor_specialization().toLowerCase().contains(query.toLowerCase()) ||
-                        doctor.getDoctor_city().toLowerCase().contains(query.toLowerCase());
+                boolean matchesSearch = (doctor.getDoctor_name() != null && doctor.getDoctor_name().toLowerCase().contains(lowerCaseQuery)) ||
+                        (doctor.getDoctor_specialization() != null && doctor.getDoctor_specialization().toLowerCase().contains(lowerCaseQuery)) ||
+                        (doctor.getDoctor_city() != null && doctor.getDoctor_city().toLowerCase().contains(lowerCaseQuery));
 
                 boolean matchesSpecialty = !filterBySpecialty ||
-                        doctor.getDoctor_specialization().equalsIgnoreCase(selectedSpecialty);
+                        (doctor.getDoctor_specialization() != null && doctor.getDoctor_specialization().equalsIgnoreCase(selectedSpecialty));
 
                 if (matchesSearch && matchesSpecialty) {
                     searchResults.add(doctor);
@@ -151,10 +186,11 @@ public class Doctorslist extends AppCompatActivity {
 
             filteredList.clear();
             filteredList.addAll(searchResults);
-            updateUI();
 
-            // Update the count to show filtered results
-            updateDoctorCount(filteredList.size());
+            // Update counts for filtered doctors
+            updateCounts(filteredList);
+
+            updateUI();
         }
     }
 
@@ -166,14 +202,15 @@ public class Doctorslist extends AppCompatActivity {
             filteredList.addAll(doctorList);
         } else {
             for (Users doctor : doctorList) {
-                if (doctor.getDoctor_specialization().equalsIgnoreCase(selectedSpecialty)) {
+                if (doctor.getDoctor_specialization() != null &&
+                        doctor.getDoctor_specialization().equalsIgnoreCase(selectedSpecialty)) {
                     filteredList.add(doctor);
                 }
             }
         }
 
-        // Update the count to show filtered results
-        updateDoctorCount(filteredList.size());
+        // Update counts for filtered doctors
+        updateCounts(filteredList);
         updateUI();
     }
 
@@ -220,7 +257,10 @@ public class Doctorslist extends AppCompatActivity {
             binding.docsearchBar.setQuery("", false);
             filteredList.clear();
             filteredList.addAll(doctorList);
-            updateDoctorCount(doctorList.size());
+
+            // Update counts after clearing filters
+            updateCounts(filteredList);
+
             updateUI();
         });
     }

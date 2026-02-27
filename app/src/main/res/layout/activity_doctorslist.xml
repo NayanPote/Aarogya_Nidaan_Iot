@@ -6,7 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/premium_background"
+    android:background="@color/background_light"
     tools:context=".Doctorslist">
 
     <!-- App Bar with Collapsing Toolbar -->
@@ -44,13 +44,14 @@
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:padding="12dp"
                         android:layout_centerVertical="true"
-                        android:contentDescription="Back"/>
+                        android:contentDescription="Back"
+                        app:tint="@color/main_dark" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Top Doctors"
-                        android:textColor="@color/white"
+                        android:textColor="@color/main_dark"
                         android:textSize="22sp"
                         android:fontFamily="@font/poppins_bold"
                         android:layout_centerVertical="true"
@@ -74,7 +75,7 @@
                 android:orientation="vertical"
                 android:layout_marginTop="?attr/actionBarSize"
                 android:paddingBottom="16dp"
-                android:background="@drawable/toolbar_gradient">
+                android:background="@drawable/logobackground_gradient">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -94,6 +95,38 @@
                     android:fontFamily="@font/poppins_regular"
                     android:layout_marginStart="16dp"
                     android:layout_marginBottom="8dp"/>
+
+                <!-- Enhanced Search Bar -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/search_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="4dp">
+
+                    <androidx.appcompat.widget.SearchView
+                        android:id="@+id/docsearch_bar"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:background="@drawable/search_bg"
+                        android:textColor="@color/dark_text"
+                        android:textSize="16sp"
+                        app:iconifiedByDefault="false"
+                        app:queryHint="Search specialists by name or specialty"
+                        app:searchIcon="@drawable/ic_search"/>
+                </androidx.cardview.widget.CardView>
+
+<!--                <TextView-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="results : "-->
+<!--                    android:textColor="@color/white"-->
+<!--                    android:textSize="16sp"-->
+<!--                    android:layout_marginStart="16dp"-->
+<!--                    android:layout_marginTop="8dp"/>-->
 
                 <!-- Doctor Statistics Cards -->
                 <LinearLayout
@@ -122,10 +155,11 @@
                             android:background="@drawable/stat_card_background">
 
                             <TextView
+                                android:id="@+id/specialistcount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="24+"
-                                android:textColor="@color/primary_dark"
+                                android:textColor="@color/main_dark"
                                 android:textSize="22sp"
                                 android:fontFamily="@font/poppins_bold"/>
 
@@ -133,7 +167,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Specialties"
-                                android:textColor="@color/text_secondary"
+                                android:textColor="@color/main_dark"
                                 android:textSize="12sp"/>
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
@@ -160,7 +194,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="1000+"
-                                android:textColor="@color/primary_dark"
+                                android:textColor="@color/main_dark"
                                 android:textSize="22sp"
                                 android:fontFamily="@font/poppins_bold"/>
 
@@ -168,7 +202,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Doctors"
-                                android:textColor="@color/text_secondary"
+                                android:textColor="@color/main_dark"
                                 android:textSize="12sp"/>
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
@@ -191,10 +225,11 @@
                             android:background="@drawable/stat_card_background">
 
                             <TextView
+                                android:id="@+id/citycount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="250+"
-                                android:textColor="@color/primary_dark"
+                                android:textColor="@color/main_dark"
                                 android:textSize="22sp"
                                 android:fontFamily="@font/poppins_bold"/>
 
@@ -202,7 +237,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Cities"
-                                android:textColor="@color/text_secondary"
+                                android:textColor="@color/main_dark"
                                 android:textSize="12sp"/>
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
@@ -222,36 +257,13 @@
             android:layout_height="wrap_content"
             android:padding="8dp">
 
-            <!-- Enhanced Search Bar -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/search_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp">
-
-                <androidx.appcompat.widget.SearchView
-                    android:id="@+id/docsearch_bar"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:background="@drawable/search_bg"
-                    android:textColor="@color/dark_text"
-                    android:textSize="16sp"
-                    app:iconifiedByDefault="false"
-                    app:queryHint="Search specialists by name or specialty"
-                    app:searchIcon="@drawable/ic_search"/>
-            </androidx.cardview.widget.CardView>
-
             <!-- Category Chips -->
             <HorizontalScrollView
                 android:id="@+id/category_scroll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/search_card"
                 android:layout_marginTop="16dp"
+                android:visibility="gone"
                 android:scrollbars="none">
 
                 <com.google.android.material.chip.ChipGroup
@@ -267,7 +279,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="All"
-                        app:chipBackgroundColor="@color/main_dark"
+                        app:chipBackgroundColor="@color/colorPrimaryDark"
                         android:textColor="@color/white"
                         android:checked="true"/>
 
@@ -304,7 +316,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Top Rated Specialists"
-                android:textColor="@color/dark_text"
+                android:textColor="@color/main_dark"
                 android:textSize="18sp"
                 android:layout_below="@id/category_scroll"
                 android:layout_marginStart="8dp"
@@ -322,6 +334,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:layout_marginEnd="4dp"
+                    tools:listitem="@layout/doctorslist_item"
                     android:paddingBottom="16dp"
                     android:clipToPadding="false"/>
 
@@ -390,6 +403,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
+        android:visibility="gone"
         android:src="@drawable/ic_filter"
         app:backgroundTint="@color/main_dark"
         app:tint="@color/white"

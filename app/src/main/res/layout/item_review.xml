@@ -5,27 +5,32 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="2dp">
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardUseCompatPadding="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:background="@android:color/transparent">
 
         <!-- Existing user review content -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imgUserAvatar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
                 android:scaleType="centerCrop"
-                app:shapeAppearanceOverlay="@style/CircleImageView" />
+                app:shapeAppearanceOverlay="@style/CircleImageView"
+                android:contentDescription="User Avatar" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -49,31 +54,33 @@
                     android:layout_height="wrap_content"
                     android:text="DOC67890"
                     android:textColor="#757575"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:layout_marginTop="2dp" />
             </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <RatingBar
-            android:id="@+id/ratingBarReview"
-            style="?android:attr/ratingBarStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:isIndicator="true"
-            android:numStars="5"
-            android:rating="4" />
+                android:id="@+id/ratingBarReview"
+                style="?android:attr/ratingBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:numStars="5"
+                android:rating="4"
+                android:isIndicator="true"
+                app:tint="@color/rating_yellow" />
 
             <TextView
                 android:id="@+id/tvReviewDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="10dp"
                 android:text="March 15, 2025"
                 android:textColor="#757575"
                 android:textSize="12sp" />
@@ -83,18 +90,20 @@
             android:id="@+id/tvReviewContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             android:text="This app has been extremely helpful in managing patient appointments and medical records. The interface is clean and user-friendly. Would recommend to all healthcare professionals."
             android:textColor="#333333"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:lineSpacingExtra="4dp" />
 
         <!-- Add Reply Button (visible only for admins) -->
         <Button
             android:id="@+id/btnAddReply"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
+            android:layout_marginTop="12dp"
             android:text="Add Reply"
             android:textAllCaps="false"
             android:visibility="gone" />
@@ -104,10 +113,13 @@
             android:id="@+id/layoutAdminReply"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#F7F9FC"
+            android:layout_marginTop="16dp"
+            android:background="#F2F7FB"
             android:orientation="vertical"
             android:padding="16dp"
-            android:visibility="gone">
+            android:visibility="gone"
+            android:clipToPadding="false"
+            android:clipChildren="false">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -116,16 +128,16 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:contentDescription="AarogyaNidaan logo"
                     android:src="@drawable/aarogyanidaanlogo" />
 
                 <TextView
                     android:id="@+id/tvAdminReplyName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:textAlignment="center"
+                    android:layout_marginStart="10dp"
                     android:text="AarogyaNidaan Team"
                     android:textColor="@color/primary_color"
                     android:textSize="14sp"
@@ -135,7 +147,7 @@
                     android:id="@+id/tvAdminReplyDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="12dp"
                     android:text="March 16, 2025"
                     android:textColor="#757575"
                     android:textSize="12sp" />
@@ -144,17 +156,19 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginVertical="8dp"
-                android:background="#E0E0E0" />
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="8dp"
+                android:background="#D1D9E6" />
 
             <TextView
                 android:id="@+id/tvAdminReplyContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:lineSpacingExtra="4dp"
                 android:text="Thank you for your feedback! We're glad the app is helping healthcare professionals like you."
+                android:lineSpacingExtra="4dp"
                 android:textColor="#333333"
                 android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
+
 </androidx.cardview.widget.CardView>

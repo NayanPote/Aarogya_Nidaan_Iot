@@ -1,15 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Pressed State -->
     <item android:state_pressed="true">
         <shape android:shape="rectangle">
-            <solid android:color="#007BFF"/>  <!-- Darker blue when pressed -->
+            <gradient
+                android:angle="135"
+                android:startColor="#FF9A9A"
+                android:centerColor="#FF4C5B"
+                android:endColor="#D32F2F"
+                android:type="linear" />
             <corners android:radius="12dp"/>
         </shape>
     </item>
+
+    <!-- Default State -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#5B5B5B"/>  <!-- Normal blue color -->
+            <gradient
+                android:angle="135"
+                android:startColor="#FF9A9A"
+                android:centerColor="#FF4C5B"
+                android:endColor="#D32F2F"
+                android:type="linear" />
             <corners android:radius="12dp"/>
         </shape>
     </item>
+
 </selector>

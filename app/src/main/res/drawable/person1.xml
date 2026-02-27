@@ -2,7 +2,7 @@
     <item>
         <!-- Circular background -->
         <shape android:shape="oval">
-            <solid android:color="#1E4EA8"/> <!-- Change to desired color -->
+            <solid android:color="@color/colorPrimaryDark"/> <!-- Change to desired color -->
             <size android:width="30dp" android:height="30dp"/> <!-- Adjust size -->
         </shape>
     </item>

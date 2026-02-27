@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="12dp"
-    android:layout_marginTop="2dp"
-    app:cardBackgroundColor="#FFFFFF">
+    android:layout_margin="5dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="4dp"
+    app:strokeWidth="0dp"
+    app:cardBackgroundColor="?attr/colorSurface"
+    android:foreground="?attr/selectableItemBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp"
-        android:background="@drawable/patient_card_gradient_background">
+        android:background="@drawable/card_gradient_background"
+        android:gravity="center_vertical">
 
         <FrameLayout
             android:id="@+id/avatarContainer"
@@ -26,9 +30,10 @@
                 android:id="@+id/avatar"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
-                android:src="@drawable/patientavatar2"
+                android:padding="2dp"
+                android:src="@drawable/patientavatar3"
                 android:scaleType="centerCrop"
-                android:contentDescription="Patient profile picture"
+                android:contentDescription="Doctor profile picture"
                 app:shapeAppearanceOverlay="@style/CircularImageView"
                 app:strokeColor="#E0E0E0"
                 app:strokeWidth="2dp"/>
@@ -46,78 +51,135 @@
                 android:visibility="gone"
                 android:text="0"
                 android:elevation="6dp"/>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/docstatus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="2dp"
+                android:layout_marginBottom="2dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="3dp"
+                app:cardBackgroundColor="#4CAF50"
+                app:strokeWidth="2dp"
+                app:strokeColor="?attr/colorSurface">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </com.google.android.material.card.MaterialCardView>
         </FrameLayout>
 
-        <!-- Info Container -->
+        <!-- Content Container -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_marginStart="16dp"
             android:orientation="vertical">
 
-            <!-- Name -->
-            <TextView
-                android:id="@+id/nameText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:fontFamily="sans-serif-medium"
-                android:textColor="@android:color/black"/>
-
-            <!-- ID -->
-            <TextView
-                android:id="@+id/idText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:textColor="#4CAF50"
-                android:fontFamily="sans-serif-light"
-                android:layout_marginTop="2dp"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"/>
-
-            <!-- Last Message -->
-            <TextView
-                android:id="@+id/lastMessageText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:fontFamily="sans-serif"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:textColor="#424242"
-                android:layout_marginTop="4dp"/>
-
-            <!-- Timestamp with icon -->
+            <!-- Header Section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginTop="4dp">
+                android:layout_marginBottom="4dp">
 
-                <ImageView
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
-                    android:src="@drawable/ic_time"
-                    android:contentDescription="Time icon"
-                    app:tint="#9E9E9E" />
-
+                <!-- Doctor Name -->
                 <TextView
-                    android:id="@+id/timestampText"
+                    android:id="@+id/nameText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Nayan Pote"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/main_dark"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+                <!-- Time Icon and Timestamp -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:textColor="@android:color/darker_gray"
-                    android:fontFamily="sans-serif-light"
-                    android:layout_marginStart="4dp"/>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="8dp">
+
+                    <ImageView
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:src="@drawable/ic_time"
+                        android:contentDescription="Time icon"/>
+
+                    <TextView
+                        android:id="@+id/timestampText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2:30 PM"
+                        android:textSize="11sp"
+                        android:fontFamily="sans-serif"
+                        android:layout_marginStart="3dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Doctor ID -->
+            <TextView
+                android:id="@+id/idText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ID: DOC001"
+                android:textSize="11sp"
+                android:fontFamily="monospace"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/dividerColor"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Last Message Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <!-- Message Type Icon -->
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_chat_bubble"
+                    android:contentDescription="Message icon"
+                    android:layout_marginEnd="6dp" />
+
+                <!-- Last Message Text -->
+                <TextView
+                    android:id="@+id/lastMessageText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Thank you for the consultation. I feel much better now."
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:lineSpacingExtra="2dp" />
+
+                <!-- Message Status Indicator -->
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_double_check"
+                    android:contentDescription="Message read status"
+                    app:tint="#4CAF50"
+                    android:layout_marginStart="8dp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

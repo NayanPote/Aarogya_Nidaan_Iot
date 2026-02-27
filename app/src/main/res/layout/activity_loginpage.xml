@@ -4,32 +4,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/logobackground_gradient"
     android:id="@+id/main"
     tools:context=".loginpage">
 
-    <!-- Animated gradient background -->
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/useful1" />
-
     <!-- Overlay for depth -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/useful2" />
+<!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:background="@drawable/useful2" />-->
 
     <!-- Decorative wave pattern at the top -->
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="180dp"
-        android:layout_alignParentTop="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/wave_pattern_top"
-        android:alpha="0.7" />
-
-
+<!--    <ImageView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="180dp"-->
+<!--        android:layout_alignParentTop="true"-->
+<!--        android:scaleType="fitXY"-->
+<!--        android:src="@drawable/wave_pattern_top"-->
+<!--        android:alpha="0.7" />-->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -50,7 +42,6 @@
                 android:layout_width="160dp"
                 android:layout_height="160dp"
                 app:cardCornerRadius="80dp"
-                app:cardElevation="16dp"
                 android:layout_marginTop="10dp">
 
                 <ImageView
@@ -83,10 +74,10 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:layout_gravity="center"
-            android:text="True Diagnosis for Wellness"
+            android:text="@string/tagline"
             android:textColor="@color/white"
             android:textSize="20sp"
-            android:textStyle="bold"
+            android:textStyle="bold|italic"
             android:letterSpacing="0.08"
             android:elevation="4dp"
             android:shadowColor="#80000000"
@@ -99,17 +90,11 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp"
             app:cardCornerRadius="24dp"
-            app:cardElevation="12dp"
             app:strokeWidth="1dp"
             app:strokeColor="#40FFFFFF"
             app:cardBackgroundColor="#E6FFFFFF">
 
-            <!-- Subtle background pattern -->
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:alpha="0.05" />
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -223,6 +208,18 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <TextView
+            android:id="@+id/copyright"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:text="© 2025 Nayan Pote. All rights reserved."
+            android:layout_gravity="bottom|center"
+            android:layout_marginTop="35dp"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:fontFamily="sans-serif" />
     </LinearLayout>
 
     <!-- Decorative wave pattern at the bottom -->
@@ -234,143 +231,3 @@
         android:src="@drawable/wave_pattern_bottom"
         android:alpha="0.7" />
 </RelativeLayout>
-
-
-<!--<?xml version="1.0" encoding="utf-8"?>-->
-<!--<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--    android:layout_width="match_parent"-->
-<!--    android:layout_height="match_parent"-->
-<!--    android:background="@drawable/background"-->
-<!--    android:id="@+id/main"-->
-<!--    android:fillViewport="true">-->
-
-<!--    <LinearLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:orientation="vertical"-->
-<!--        android:gravity="center"-->
-<!--        android:padding="16dp">-->
-
-<!--        &lt;!&ndash; Logo &ndash;&gt;-->
-<!--        <ImageView-->
-<!--            android:id="@+id/logo"-->
-<!--            android:layout_width="160dp"-->
-<!--            android:layout_height="160dp"-->
-<!--            android:src="@drawable/aarogyanidaanlogo"-->
-<!--            android:layout_marginTop="40dp" />-->
-
-<!--        &lt;!&ndash; App Name &ndash;&gt;-->
-<!--        <TextView-->
-<!--            android:id="@+id/appName"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginTop="8dp"-->
-<!--            android:text="Aarogya Nidaan"-->
-<!--            android:textColor="#FFFFFF"-->
-<!--            android:textSize="35sp"-->
-<!--            android:textStyle="bold"-->
-<!--            android:gravity="center" />-->
-
-<!--        &lt;!&ndash; Tagline &ndash;&gt;-->
-<!--        <TextView-->
-<!--            android:id="@+id/tagline"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginTop="8dp"-->
-<!--            android:text="True Diagnosis for Wellness"-->
-<!--            android:textColor="#A4E259"-->
-<!--            android:textSize="18sp"-->
-<!--            android:textStyle="italic"-->
-<!--            android:gravity="center" />-->
-
-<!--        &lt;!&ndash; Email Input &ndash;&gt;-->
-<!--        <EditText-->
-<!--            android:id="@+id/emailInput"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="50dp"-->
-<!--            android:layout_marginTop="24dp"-->
-<!--            android:background="@drawable/whitebutton"-->
-<!--            android:drawableLeft="@drawable/email"-->
-<!--            android:drawablePadding="10dp"-->
-<!--            android:hint="Email"-->
-<!--            android:inputType="textEmailAddress"-->
-<!--            android:paddingStart="16dp"-->
-<!--            android:textSize="18sp" />-->
-
-<!--        &lt;!&ndash; Password Input &ndash;&gt;-->
-<!--        <EditText-->
-<!--            android:id="@+id/passwordInput"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="50dp"-->
-<!--            android:layout_marginTop="16dp"-->
-<!--            android:background="@drawable/whitebutton"-->
-<!--            android:drawableLeft="@drawable/passwordicon"-->
-<!--            android:drawablePadding="10dp"-->
-<!--            android:hint="Password"-->
-<!--            android:inputType="textPassword"-->
-<!--            android:paddingStart="16dp"-->
-<!--            android:textSize="18sp" />-->
-
-<!--        &lt;!&ndash; Remember Me & New User Section &ndash;&gt;-->
-<!--        <LinearLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:orientation="horizontal"-->
-<!--            android:layout_marginTop="8dp"-->
-<!--            android:paddingStart="4dp"-->
-<!--            android:paddingEnd="4dp">-->
-
-<!--            <CheckBox-->
-<!--                android:id="@+id/rememberme"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Remember me"-->
-<!--                android:textSize="14sp"-->
-<!--                android:textColor="#FFFFFF" />-->
-
-<!--            <TextView-->
-<!--                android:id="@+id/newuser"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_weight="1"-->
-<!--                android:gravity="end"-->
-<!--                android:text="New? Register."-->
-<!--                android:textSize="14sp"-->
-<!--                android:textColor="#FFFFFF" />-->
-<!--        </LinearLayout>-->
-
-<!--        <TextView-->
-<!--            android:id="@+id/forgotpassword"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="Forgot Password?"-->
-<!--            android:textColor="@color/white"-->
-<!--            android:layout_marginStart="10dp"-->
-<!--            android:layout_marginTop="20dp"-->
-<!--            android:visibility="invisible"/>-->
-
-<!--        &lt;!&ndash; Login Button &ndash;&gt;-->
-<!--        <Button-->
-<!--            android:id="@+id/loginbutton"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="50dp"-->
-<!--            android:layout_marginTop="8dp"-->
-<!--            android:background="@drawable/bluebutton"-->
-<!--            android:text="Login"-->
-<!--            android:textSize="16sp"-->
-<!--            android:textColor="#FFFFFF" />-->
-
-<!--        &lt;!&ndash; Footer (Copyright Text) &ndash;&gt;-->
-<!--        <TextView-->
-<!--            android:id="@+id/copyright"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginTop="24dp"-->
-<!--            android:text="© 2025 Nayan Pote. All rights reserved."-->
-<!--            android:textSize="12sp"-->
-<!--            android:textColor="#FFFFFF"-->
-<!--            android:gravity="center" />-->
-
-<!--    </LinearLayout>-->
-
-<!--</ScrollView>-->

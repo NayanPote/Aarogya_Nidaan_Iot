@@ -13,7 +13,7 @@
         android:layout_height="250dp"
         android:gravity="bottom"
         android:padding="25dp"
-        android:background="@drawable/button11"
+        android:background="@drawable/logobackground_gradient2"
         android:elevation="0dp">
 
         <!-- Profile Image in a Circular Card -->
@@ -22,7 +22,7 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_gravity="left"
-            android:src="@drawable/doctoravatar3"
+            android:src="@drawable/doctor2"
             android:background="@drawable/circular_border"
             android:contentDescription="Doctor's photo"/>
 

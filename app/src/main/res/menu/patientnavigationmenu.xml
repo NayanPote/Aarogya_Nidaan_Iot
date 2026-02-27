@@ -2,24 +2,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Profile Section -->
-    <item
-        android:id="@+id/patientsettings"
-        android:icon="@drawable/settings"
-        android:title="Settings"
-        android:iconTint="@color/main_dark"/>
+<!--    <item-->
+<!--        android:id="@+id/patientsettings"-->
+<!--        android:icon="@drawable/settings"-->
+<!--        android:title="Settings"-->
+<!--        android:iconTint="@color/main_dark"/>-->
 
-    <!-- Support & Communication -->
+    <!-- profile -->
     <item
-        android:id="@+id/patienthelp"
-        android:icon="@drawable/needhelp"
-        android:title="Need Help?"
+        android:id="@+id/patientprofile"
+        android:icon="@drawable/ic_profile"
+        android:title="Profile"
         android:iconTint="@color/main_dark"/>
 
     <item
         android:id="@+id/patientrate"
         android:icon="@drawable/star"
         android:title="Rate And Review"
-        android:iconTint="@color/main_dark"/>
+        android:iconTint="@color/black"/>
 
     <!-- Legal & Information -->
     <item

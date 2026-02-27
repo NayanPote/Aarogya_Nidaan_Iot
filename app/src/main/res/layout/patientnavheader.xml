@@ -1,81 +1,174 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-
+    <!-- Main Header Container -->
     <LinearLayout
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="250dp"
-    android:gravity="left|top"
-    android:padding="25dp"
-    android:background="@drawable/toolbar_gradient"
-    android:elevation="0dp">
+        android:id="@+id/header_container"
+        android:layout_width="0dp"
+        android:layout_height="320dp"
+        android:orientation="vertical"
+        android:background="@drawable/logobackground_gradient2"
+        android:elevation="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <ImageButton
-            android:id="@+id/back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|start"
-            android:src="@drawable/back"
-            android:layout_marginTop="20dp"
-            android:background="@color/transparent"/>
-
+        <!-- Top Section with Back Button -->
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="left|bottom"
-            android:elevation="0dp">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:layout_marginStart="20dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-            <!-- Profile Image in a Circular Card -->
-            <ImageView
-                android:id="@+id/patientnavimg"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_gravity="left"
-                android:src="@drawable/patientavatar2"
-                android:background="@drawable/circular_border"
-                android:contentDescription="Patients's photo"/>
-
-            <!-- Patient Name -->
-            <TextView
-                android:id="@+id/patientnavname"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Patient Name"
-                android:textColor="@color/white"
-                android:textSize="20dp"
-                android:layout_marginTop="9dp"
-                android:textAppearance="?attr/textAppearanceHeadline6"/>
-
-            <!-- Patient Email -->
-            <TextView
-                android:id="@+id/patientnavemail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Patient email"
-                android:textColor="#B4B4B4"
-                android:textSize="16dp"
-                android:layout_marginTop="2dp"
-                android:textAppearance="?attr/textAppearanceBody2"/>
-
-            <TextView
-                android:id="@+id/patientnavid"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Patient Id"
-                android:textColor="#B4B4B4"
-                android:textSize="12dp"
-                android:layout_marginTop="2dp"
-                android:textAppearance="?attr/textAppearanceBody2"/>
+            <ImageButton
+                android:id="@+id/back"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/back"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="12dp"
+                android:contentDescription="Navigate back" />
 
         </LinearLayout>
+
+        <!-- Profile Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingBottom="24dp"
+            android:gravity="bottom">
+
+            <!-- Profile Image and Edit Button Container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical">
+
+                <!-- Profile Image Container -->
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <!-- Gradient Ring (Outer Circle) -->
+                    <View
+                        android:layout_width="90dp"
+                        android:layout_height="90dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/profile_ring_gradient" />
+
+                    <!-- Circular Profile Image inside CardView -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="75dp"
+                        android:layout_height="75dp"
+                        android:layout_gravity="center"
+                        app:cardCornerRadius="37.5dp"
+                        app:cardElevation="8dp">
+
+                        <ImageView
+                            android:id="@+id/patientnavimg"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/patient"
+                            android:padding="3dp"
+                            android:scaleType="centerCrop"
+                            android:contentDescription="Patient's photo" />
+
+                    </androidx.cardview.widget.CardView>
+
+                </FrameLayout>
+
+                <!-- Edit Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/pat_edit_profile"
+                    style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    app:icon="@drawable/ic_edit"
+                    app:iconSize="22dp"
+                    app:cornerRadius="23dp"
+                    app:backgroundTint="@color/white"
+                    android:layout_gravity="bottom"
+                    android:visibility="gone"
+                    app:iconTint="@color/main_dark"
+                    app:elevation="4dp"
+                    android:contentDescription="Edit profile" />
+
+            </LinearLayout>
+
+            <!-- Patient Information Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Patient Name -->
+                <TextView
+                    android:id="@+id/patientnavname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nayan Pote"
+                    android:textColor="@color/white"
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginBottom="6dp"
+                    android:letterSpacing="0.01"
+                    android:textAppearance="?attr/textAppearanceHeadline5" />
+
+                <!-- Patient Email -->
+                <TextView
+                    android:id="@+id/patientnavemail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="nayan.pote65@gmail.com"
+                    android:textColor="#E8E8E8"
+                    android:textSize="16sp"
+                    android:layout_marginBottom="4dp"
+                    android:fontFamily="sans-serif"
+                    android:textAppearance="?attr/textAppearanceBody1" />
+
+                <!-- Patient ID with Label -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ID: "
+                        android:textColor="#B8B8B8"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/patientnavid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Developer"
+                        android:textColor="#CCCCCC"
+                        android:textSize="14sp"
+                        android:fontFamily="monospace"
+                        android:textAppearance="?attr/textAppearanceBody2" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
     </LinearLayout>
-</LinearLayout>
 
-
+</androidx.constraintlayout.widget.ConstraintLayout>

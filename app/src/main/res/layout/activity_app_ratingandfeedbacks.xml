@@ -48,6 +48,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
+                    android:background="@drawable/logobackground_gradient2"
                     android:padding="16dp">
 
                     <!-- Average Rating Section -->
@@ -63,7 +64,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="4.7"
-                            android:textColor="@color/black"
+                            android:textColor="@color/white"
                             android:textSize="42sp"
                             android:textStyle="bold" />
 
@@ -72,7 +73,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="1,024 ratings"
-                            android:textColor="#5A5A5A"
+                            android:textColor="@color/white"
                             android:textSize="14sp" />
 
                         <RatingBar
@@ -88,6 +89,14 @@
                             android:progressTint="@color/rating_yellow"
                             android:secondaryProgressTint="@color/rating_yellow" />
                     </LinearLayout>
+
+                    <!-- Divider line -->
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="60dp"
+                        android:background="@color/white"
+                        android:layout_marginHorizontal="12dp"
+                        android:layout_gravity="center_vertical"/>
 
                     <!-- Rating Distribution Section -->
                     <LinearLayout
@@ -108,7 +117,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="5"
-                                android:textSize="12sp" />
+                                android:textSize="12sp"
+                                android:textColor="@color/white"/>
 
                             <ProgressBar
                                 android:id="@+id/progressBar5"
@@ -125,7 +135,8 @@
                                 android:layout_width="30dp"
                                 android:layout_height="wrap_content"
                                 android:text="714"
-                                android:textSize="12sp" />
+                                android:textSize="12sp"
+                                android:textColor="@color/white"/>
                         </LinearLayout>
 
                         <!-- 4 star row -->
@@ -140,7 +151,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="4"
-                                android:textSize="12sp" />
+                                android:textSize="12sp"
+                                android:textColor="@color/white"/>
 
                             <ProgressBar
                                 android:id="@+id/progressBar4"
@@ -157,7 +169,8 @@
                                 android:layout_width="30dp"
                                 android:layout_height="wrap_content"
                                 android:text="210"
-                                android:textSize="12sp" />
+                                android:textSize="12sp"
+                                android:textColor="@color/white"/>
                         </LinearLayout>
 
                         <!-- 3 star row -->
@@ -172,7 +185,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="3"
-                                android:textSize="12sp" />
+                                android:textSize="12sp"
+                                android:textColor="@color/white"/>
 
                             <ProgressBar
                                 android:id="@+id/progressBar3"
@@ -189,7 +203,8 @@
                                 android:layout_width="30dp"
                                 android:layout_height="wrap_content"
                                 android:text="49"
-                                android:textSize="12sp" />
+                                android:textSize="12sp"
+                                android:textColor="@color/white"/>
                         </LinearLayout>
 
                         <!-- 2 star row -->
@@ -204,7 +219,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="2"
-                                android:textSize="12sp" />
+                                android:textSize="12sp"
+                                android:textColor="@color/white"/>
 
                             <ProgressBar
                                 android:id="@+id/progressBar2"
@@ -221,7 +237,8 @@
                                 android:layout_width="30dp"
                                 android:layout_height="wrap_content"
                                 android:text="32"
-                                android:textSize="12sp" />
+                                android:textSize="12sp"
+                                android:textColor="@color/white"/>
                         </LinearLayout>
 
                         <!-- 1 star row -->
@@ -236,7 +253,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="1"
-                                android:textSize="12sp" />
+                                android:textSize="12sp"
+                                android:textColor="@color/white"/>
 
                             <ProgressBar
                                 android:id="@+id/progressBar1"
@@ -253,7 +271,8 @@
                                 android:layout_width="30dp"
                                 android:layout_height="wrap_content"
                                 android:text="19"
-                                android:textSize="12sp" />
+                                android:textSize="12sp"
+                                android:textColor="@color/white"/>
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
@@ -265,13 +284,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
+                app:cardCornerRadius="20dp"
+                app:cardElevation="8dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
+                    android:background="@drawable/card_gradient_background"
                     android:padding="16dp">
 
                     <TextView
@@ -298,6 +318,7 @@
                         android:layout_gravity="center_horizontal"
                         android:layout_marginTop="16dp"
                         android:numStars="5"
+                        android:rating="4"
                         android:stepSize="0.5" />
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -325,6 +346,7 @@
                         android:padding="12dp"
                         android:text="Submit"
                         android:textAllCaps="false"
+                        android:backgroundTint="@color/main_dark"
                         app:cornerRadius="8dp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>

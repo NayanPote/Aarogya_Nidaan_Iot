@@ -6,34 +6,34 @@
 
     <!-- Chatbot Head -->
     <path
-        android:fillColor="#306BCE"
+        android:fillColor="#A9244D"
         android:pathData="M20,30 h60 a10,10 0 0 1 10,10 v20 a10,10 0 0 1 -10,10 h-60 a10,10 0 0 1 -10,-10 v-20 a10,10 0 0 1 10,-10z"/>
 
     <!-- Speech Bubble -->
     <path
-        android:fillColor="#FFFFFF"
+        android:fillColor="#F8F9FA"
         android:pathData="M30,40 h40 a5,5 0 0 1 5,5 v10 a5,5 0 0 1 -5,5 h-20 l-10,5 2,-5 h-10 a5,5 0 0 1 -5,-5 v-10 a5,5 0 0 1 5,-5z"/>
 
-    <!-- Chatbot Eyes (Fixed for Compatibility) -->
-    <path android:fillColor="#0F172A"
+    <!-- Chatbot Eyes -->
+    <path android:fillColor="#2D1B23"
         android:pathData="M38,50 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"/>
-    <path android:fillColor="#0F172A"
+    <path android:fillColor="#2D1B23"
         android:pathData="M58,50 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"/>
 
-    <!-- Antennas (Joined) -->
-    <path android:fillColor="#306BCE"
+    <!-- Antennas -->
+    <path android:fillColor="#B91D47"
         android:pathData="M30,30 l-6,-14 a3,3 0 1 1 5,-3 l7,15z"/>
-    <path android:fillColor="#306BCE"
+    <path android:fillColor="#B91D47"
         android:pathData="M70,30 l6,-14 a3,3 0 1 0 -5,-3 l-7,15z"/>
 
-    <!-- Bottom Stand-->
-    <path android:fillColor="#1E4EA8"
+    <!-- Bottom Stand -->
+    <path android:fillColor="#6B1728"
         android:pathData="M20,70 h60 v10 h-60z"/>
-    <path android:fillColor="#306BCE"
+    <path android:fillColor="#A9244D"
         android:pathData="M10,80 h80 v10 h-80z"/>
 
-    <!-- Healthcare Plus Symbol (Thinner and Closer) -->
+    <!-- Healthcare Plus Symbol -->
     <path
-        android:fillColor="#DC2626"
+        android:fillColor="#FF2626"
         android:pathData="M82,73 h5 v5 h5 v5 h-5 v5 h-5 v-5 h-5 v-5 h5z"/>
 </vector>

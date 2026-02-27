@@ -2,37 +2,52 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Location (needed for Bluetooth scanning on Android 11) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- Network permissions -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Internet & Network -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- Bluetooth permissions -->
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Bluetooth permissions for Android 12+ -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" /> <!-- Camera and Audio permissions -->
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" /> <!-- Notification permissions -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> <!-- Foreground and Wake permissions -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- Boot and Alarm permissions -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" /> <!-- Optional permissions for older versions -->
-    <uses-permission android:name="android.permission.VIBRATE" /> <!-- Feature requirements -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
 
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="false" />
-    <uses-feature
-        android:name="android.hardware.bluetooth"
-        android:required="false" />
-    <uses-feature
-        android:name="android.hardware.telephony"
-        android:required="false" />
-    <uses-feature
-        android:glEsVersion="0x00020000"
-        android:required="true" />
+    <!-- Camera & Audio -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Notifications -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Foreground & Wake -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Boot & Alarm -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!-- Storage (Scoped Storage for Android 11+) -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+
+    <!-- Hardware Features -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
+
+    <!-- New for Android 14+ connectedDevice foreground service -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
 
     <application
         android:name=".AarogyaNidaanApplication"
@@ -44,27 +59,15 @@
         android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
+        android:theme="@style/Theme.AarogyaNidaan"
         tools:targetApi="34">
-        <activity
-            android:name=".DoctorNotificationActivity"
-            android:exported="false" />
-        <activity
-            android:name=".PatientNotificationActivity"
-            android:exported="false" />
 
-        <activity
-            android:name=".AppRatingandfeedbacks"
-            android:exported="false" />
-        <activity
-            android:name=".adminregistrationform"
-            android:exported="false" />
-        <activity
-            android:name=".AdminNotificationActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Admin"
-            android:exported="false" />
+        <!-- Services -->
+        <service
+            android:name=".BluetoothDataService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
 
         <service
             android:name=".AarogyaNidaanMessagingService"
@@ -72,42 +75,16 @@
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
-        </service> <!-- Foreground Service -->
+        </service>
+
         <service
             android:name=".NotificationForegroundService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="dataSync"
-            tools:ignore="ForegroundServicePermission" /> <!-- Boot Receiver -->
-        <receiver
-            android:name=".BootCompletedReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            tools:ignore="ForegroundServicePermission" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </receiver> <!-- Direct Reply Receiver -->
-        <receiver
-            android:name=".DirectReplyReceiver"
-            android:exported="false" /> <!-- Notification Receivers -->
-        <receiver
-            android:name=".NotificationSchedulerActivity$NotificationReceiver"
-            android:exported="false" />
-        <receiver
-            android:name=".NotificationSchedulerActivity$NotificationActionReceiver"
-            android:exported="false" />
-        <receiver
-            android:name=".NotificationSchedulerActivity$NotificationResetReceiver"
-            android:exported="false" /> <!-- Boot Receiver for Notifications -->
-        <receiver
-            android:name=".BootReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver> <!-- FileProvider -->
+        <!-- FileProvider (only once) -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -116,79 +93,77 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
-        </provider> <!-- Activities -->
+        </provider>
+
+        <!-- Receivers -->
+        <receiver
+            android:name=".BootCompletedReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".DirectReplyReceiver" android:exported="false" />
+        <receiver android:name=".NotificationSchedulerActivity$NotificationReceiver" android:exported="false" />
+        <receiver android:name=".NotificationSchedulerActivity$NotificationActionReceiver" android:exported="false" />
+        <receiver android:name=".NotificationSchedulerActivity$NotificationResetReceiver" android:exported="false" />
+
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Activities -->
         <activity
             android:name=".splashpage"
             android:exported="true"
             android:theme="@style/Theme.Design.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".NotificationSchedulerActivity"
-            android:exported="false" />
-        <activity
-            android:name=".chatbot"
-            android:exported="false" />
-        <activity
-            android:name=".AllArticlesActivity"
-            android:exported="false" />
-        <activity
-            android:name=".chathealthdata"
-            android:exported="false" />
-        <activity
-            android:name=".patientchat"
-            android:exported="false" />
-        <activity
-            android:name=".patientprofile"
-            android:exported="false" />
-        <activity
-            android:name=".ManualInputActivity"
-            android:exported="false" />
-        <activity
-            android:name=".DoctorDetailsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".loginpage"
-            android:exported="false" />
-        <activity
-            android:name=".ChatActivity"
-            android:exported="false" />
-        <activity
-            android:name=".patienthealthdata"
-            android:exported="false" />
-        <activity
-            android:name=".doctorchat"
-            android:exported="false" />
-        <activity
-            android:name=".Doctorslist"
-            android:exported="false" />
-        <activity
-            android:name=".doctordashboard"
-            android:exported="false" />
-        <activity
-            android:name=".doctortermsandcondition"
-            android:exported="false" />
-        <activity
-            android:name=".patienttermsandcondition"
-            android:exported="false" />
-        <activity
-            android:name=".patientregistrationform"
-            android:exported="false" />
-        <activity
-            android:name=".doctorregistrationform"
-            android:exported="false" />
-        <activity
-            android:name=".registeroptions"
-            android:exported="false" />
-        <activity
-            android:name=".patientdashboard"
-            android:exported="false" /> <!-- Meta-Data for Google Services -->
+
+        <activity android:name=".TemperoryTestingActivity" android:exported="false" />
+        <activity android:name=".PatienthealthdatadisplayActivity" android:exported="false" />
+        <activity android:name=".DoctorNotificationActivity" android:exported="false" />
+        <activity android:name=".PatientNotificationActivity" android:exported="false" />
+        <activity android:name=".AppRatingandfeedbacks" android:exported="false" />
+        <activity android:name=".adminregistrationform" android:exported="false" />
+        <activity android:name=".AdminNotificationActivity" android:exported="false" />
+        <activity android:name=".Admin" android:exported="false" />
+        <activity android:name=".NotificationSchedulerActivity" android:exported="false" />
+        <activity android:name=".chatbot" android:exported="false" />
+        <activity android:name=".AllArticlesActivity" android:exported="false" />
+        <activity android:name=".chathealthdata" android:exported="false" />
+        <activity android:name=".patientchat" android:exported="false" />
+        <activity android:name=".patientprofile" android:exported="false" />
+        <activity android:name=".ManualInputActivity" android:exported="false" />
+        <activity android:name=".DoctorDetailsActivity" android:exported="false" />
+        <activity android:name=".loginpage" android:exported="false" />
+        <activity android:name=".ChatActivity" android:exported="false" />
+        <activity android:name=".patienthealthdata" android:exported="false" />
+        <activity android:name=".doctorchat" android:exported="false" />
+        <activity android:name=".Doctorslist" android:exported="false" />
+        <activity android:name=".doctordashboard" android:exported="false" />
+        <activity android:name=".doctortermsandcondition" android:exported="false" />
+        <activity android:name=".patienttermsandcondition" android:exported="false" />
+        <activity android:name=".patientregistrationform" android:exported="false" />
+        <activity android:name=".doctorregistrationform" android:exported="false" />
+        <activity android:name=".registeroptions" android:exported="false" />
+        <activity android:name=".patientdashboard" android:exported="false" />
+
+        <!-- Google Play Services -->
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
     </application>
+
 </manifest>

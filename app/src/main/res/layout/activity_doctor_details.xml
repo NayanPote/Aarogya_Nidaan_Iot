@@ -3,14 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#DFF5FF">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/background_light"
+    tools:context=".DoctorDetailsActivity">
 
     <!-- Toolbar with gradient background -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@drawable/toolbar_gradiant"
+        android:background="@color/background_light"
         android:elevation="8dp">
 
         <ImageButton
@@ -20,7 +22,8 @@
             android:src="@drawable/back"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="8dp"
-            android:contentDescription="Back"/>
+            android:contentDescription="Back"
+             app:tint="@color/main_dark" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -28,7 +31,7 @@
             android:text="Doctor's Details"
             android:textSize="22sp"
             android:textStyle="bold"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/main_dark"
             android:layout_marginStart="32dp"/>
 
     </androidx.appcompat.widget.Toolbar>
@@ -59,7 +62,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp"
-                    android:background="@drawable/card_gradient">
+                    android:background="@drawable/logobackground_gradient">
 
                     <RelativeLayout
                         android:layout_width="wrap_content"
@@ -79,7 +82,8 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/doctoravatar3"
+                                android:src="@drawable/doctor3"
+                                android:padding="2dp"
                                 android:contentDescription="Doctor's photo"/>
 
                         </androidx.cardview.widget.CardView>
@@ -102,6 +106,7 @@
                         android:layout_height="wrap_content"
                         android:textSize="24sp"
                         android:textStyle="bold"
+                        android:text="doctor's Name"
                         android:textColor="#FFFFFF"
                         android:gravity="center"
                         android:layout_marginTop="16dp"/>
@@ -167,13 +172,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:cardCornerRadius="12dp"
+                app:cardCornerRadius="20dp"
                 app:cardElevation="6dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
+                    android:background="@drawable/card_gradient_background"
                     android:padding="20dp">
 
                     <TextView
@@ -428,13 +434,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:cardCornerRadius="12dp"
+                app:cardCornerRadius="20dp"
                 app:cardElevation="6dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
+                    android:background="@drawable/card_gradient_background"
                     android:padding="16dp">
 
                     <LinearLayout
@@ -597,10 +604,10 @@
                 android:text="Book Appointment"
                 android:textSize="16sp"
                 android:textColor="#FFFFFF"
+                android:backgroundTint="@color/colorPrimaryDark"
                 android:fontFamily="sans-serif-medium"
                 android:padding="15dp"
-                android:layout_gravity="center"
-                android:background="@drawable/button_gradient"/>
+                android:layout_gravity="center"/>
 
             <Button
                 android:id="@+id/requestButton"
@@ -611,10 +618,10 @@
                 android:text="Send Request"
                 android:textSize="16sp"
                 android:textColor="#FFFFFF"
+                android:backgroundTint="@color/main_dark"
                 android:fontFamily="sans-serif-medium"
                 android:padding="15dp"
-                android:layout_gravity="center"
-                android:background="@drawable/button_gradient_alt"/>
+                android:layout_gravity="center"/>
 
         </LinearLayout>
     </ScrollView>

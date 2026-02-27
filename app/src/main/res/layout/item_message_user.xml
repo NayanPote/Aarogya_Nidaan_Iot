@@ -13,7 +13,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/send_button"
+            android:background="@drawable/sendtext_button"
             android:maxWidth="280dp"
             android:orientation="vertical"
             android:padding="8dp">
@@ -36,8 +36,9 @@
         </LinearLayout>
 
         <ImageView
-            android:layout_width="43dp"
-            android:layout_height="43dp"
-            android:src="@drawable/patientavatar3"/>
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:src="@drawable/person1"
+            android:layout_marginStart="5dp"/>
     </LinearLayout>
 </RelativeLayout>

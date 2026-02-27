@@ -127,6 +127,9 @@ dependencies {
     implementation ("com.google.firebase:firebase-firestore")
     implementation ("com.google.firebase:firebase-functions")
 
+    implementation ("com.google.android.material:material:1.10.0")
+    implementation ("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation ("androidx.cardview:cardview:1.0.0")
 
     // Testing
     testImplementation(libs.junit)

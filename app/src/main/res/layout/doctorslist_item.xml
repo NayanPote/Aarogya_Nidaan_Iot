@@ -5,177 +5,193 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="@color/white">
+    app:cardCornerRadius="20dp"
+    app:cardElevation="6dp"
+    android:layout_margin="8dp"
+    app:cardBackgroundColor="@android:color/white">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/premium_gradient_background">
+        android:orientation="vertical"
+        android:background="@drawable/card_gradient_background"
+        android:padding="16dp">
 
-        <!-- Top decorative arc -->
-        <View
-            android:id="@+id/decorative_arc"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:background="@drawable/top_wave_shape"
-            android:layout_alignParentTop="true"/>
-
-        <!-- Doctor Avatar with circular frame -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/avatar_container"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="50dp"
-            app:cardElevation="8dp">
-
-            <ImageView
-                android:id="@+id/doctoravatar"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/doctoravatar3" />
-        </androidx.cardview.widget.CardView>
-
-        <!-- Doctor Details -->
+        <!-- Top Section: Avatar and Details -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/avatar_container"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="16dp"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-            <!-- Doctor Name with Verified Badge -->
-            <LinearLayout
+            <!-- Doctor Avatar with circular frame -->
+            <FrameLayout
+                android:id="@+id/avatar_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:layout_marginEnd="16dp">
 
-                <TextView
-                    android:id="@+id/doctorlistname"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="5dp"
-                    android:text="Dr. Nayan Pote"
-                    android:textColor="#CFD8DC "
-                    android:textSize="22sp"
-                    android:fontFamily="@font/poppins_bold"
-                    android:maxLines="1"
-                    android:ellipsize="end" />
+                <!-- Gradient Ring (Outer Circle) -->
+                <View
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/profile_ring_gradient"
+                    />
 
-                <ImageView
-                    android:id="@+id/verified_badge"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:gravity="center_vertical"
-                    android:src="@drawable/ic_verify"
-                    android:contentDescription="Verified Doctor" />
-            </LinearLayout>
+                <!-- Circular Profile Image inside CardView -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center"
+                    app:cardCornerRadius="40dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@android:color/white">
 
-            <!-- Rating -->
+                    <ImageView
+                        android:id="@+id/doctoravatar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/doctor3"
+                        android:contentDescription="Doctor's photo" />
+                </androidx.cardview.widget.CardView>
+            </FrameLayout>
+
+            <!-- Doctor Details -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-                <RatingBar
-                    android:id="@+id/doctor_rating"
-                    style="?android:attr/ratingBarStyleSmall"
+                <!-- Doctor Name with Verified Badge -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/doctorlistname"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Dr. Nayan Pote"
+                        android:textColor="@color/main_dark"
+                        android:textSize="18sp"
+                        android:fontFamily="@font/poppins_bold"
+                        android:maxLines="1"
+                        android:ellipsize="end" />
+
+                    <ImageView
+                        android:id="@+id/verified_badge"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="8dp"
+                        android:src="@drawable/ic_verify"
+                        android:contentDescription="Verified Doctor" />
+                </LinearLayout>
+
+                <!-- Rating -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:rating="4.8"
-                    android:progressTint="@color/gold"
-                    android:isIndicator="true" />
+                    android:layout_marginTop="4dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
-                <TextView
-                    android:id="@+id/rating_text"
+                    <RatingBar
+                        android:id="@+id/doctor_rating"
+                        style="?android:attr/ratingBarStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:rating="4.8"
+                        android:progressTint="#FFB300"
+                        android:isIndicator="true" />
+
+                    <TextView
+                        android:id="@+id/rating_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="4.8"
+                        android:textColor="#FFB300"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/poppins_regular"
+                        android:layout_marginStart="6dp"/>
+
+                    <TextView
+                        android:id="@+id/reviews_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="(236)"
+                        android:textColor="@color/main_dark"
+                        android:textSize="12sp"
+                        android:layout_marginStart="4dp"
+                        android:fontFamily="@font/poppins_regular" />
+                </LinearLayout>
+
+                <!-- Specialization -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="4.8"
-                    android:textColor="@color/gold"
-                    android:textSize="14sp"
-                    android:layout_marginStart="8dp"/>
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/premium_pill_background"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
-                <TextView
-                    android:id="@+id/reviews_count"
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/stethoscope"
+                        app:tint="@color/main_dark"/>
+
+                    <TextView
+                        android:id="@+id/doctorlistspe"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="Developer"
+                        android:textColor="@color/main_dark"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:fontFamily="@font/poppins_regular"/>
+                </LinearLayout>
+
+                <!-- Location -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="(236 reviews)"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp"
-                    android:layout_marginStart="4dp"
-                    android:fontFamily="@font/poppins_regular" />
-            </LinearLayout>
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/premium_pill_background"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
-            <!-- Specialization with enhanced styling -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/premium_pill_background"
-                android:paddingStart="12dp"
-                android:paddingEnd="16dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                android:orientation="horizontal"
-                android:elevation="4dp">
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/locationpin"
+                        app:tint="@color/main_dark" />
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/stethoscope" />
-
-                <TextView
-                    android:id="@+id/doctorlistspe"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="8dp"
-                    android:text="Cardiologist"
-                    android:textColor="@color/primary_dark"
-                    android:textStyle="bold"
-                    android:textSize="15sp"/>
-            </LinearLayout>
-
-            <!-- Location with enhanced styling -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/premium_pill_background"
-                android:paddingStart="12dp"
-                android:paddingEnd="16dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                android:orientation="horizontal"
-                android:elevation="4dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/locationpin" />
-
-                <TextView
-                    android:id="@+id/doclistcity"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="8dp"
-                    android:text="New York City"
-                    android:textColor="@color/primary_dark"
-                    android:textStyle="bold"
-                    android:textSize="15sp"/>
+                    <TextView
+                        android:id="@+id/doclistcity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="Nagpur"
+                        android:textColor="@color/main_dark"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:fontFamily="@font/poppins_regular"/>
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
@@ -183,21 +199,19 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_book_appointment"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_below="@id/avatar_container"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"
             android:text="Book Appointment"
             android:textSize="16sp"
             android:fontFamily="@font/poppins_bold"
             android:textAllCaps="false"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            app:cornerRadius="28dp"
-            android:visibility="gone"
-            app:backgroundTint="@color/accent_color"
-            app:rippleColor="@color/ripple_color"
+            app:cornerRadius="24dp"
+            app:backgroundTint="#4CAF50"
+            app:rippleColor="#81C784"
             app:icon="@drawable/colorcalander"
             app:iconGravity="textStart"
-            app:iconPadding="8dp" />
-    </RelativeLayout>
+            app:iconPadding="8dp"
+            app:iconTint="@android:color/white" />
+    </LinearLayout>
 </androidx.cardview.widget.CardView>

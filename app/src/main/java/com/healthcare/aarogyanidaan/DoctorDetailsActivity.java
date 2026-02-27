@@ -7,13 +7,8 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -21,6 +16,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.*;
+import com.healthcare.aarogyanidaan.databinding.ActivityDoctorDetailsBinding;
+import com.healthcare.aarogyanidaan.databinding.BookAppointmentBinding;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -28,28 +25,23 @@ import java.util.UUID;
 
 public class DoctorDetailsActivity extends AppCompatActivity {
 
-    private TextView doctorName, doctorSpecialization, doctorEmail;
-    private TextView doctorPhone, doctorGender, doctorCity, doctorID;
-    private ImageView doctorAvatar;
-    private View progressBar;
+    private ActivityDoctorDetailsBinding binding;
     private FirebaseDatabase database;
     private FirebaseAuth auth;
     private String doctorId;
-    private Button bookappointment, requestButton;
+
     private DatePickerDialog datePickerDialog;
     private TimePickerDialog timePickerDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_doctor_details);
+        binding = ActivityDoctorDetailsBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         // Initialize Firebase
         database = FirebaseDatabase.getInstance();
         auth = FirebaseAuth.getInstance();
-
-        // Initialize views
-        initializeViews();
 
         // Get doctor ID from intent
         doctorId = getIntent().getStringExtra("doctor_id");
@@ -60,33 +52,18 @@ public class DoctorDetailsActivity extends AppCompatActivity {
         }
 
         // Set up button listeners
-        bookappointment.setOnClickListener(v -> showBookingDialog());
-        requestButton.setOnClickListener(v -> sendChatRequest());
-        doctorID.setOnClickListener(view -> copyToClipboard(doctorID.getText().toString()));
+        binding.bookappointment.setOnClickListener(v -> showBookingDialog());
+        binding.requestButton.setOnClickListener(v -> sendChatRequest());
+        binding.doctorDetailId.setOnClickListener(view -> copyToClipboard(binding.doctorDetailId.getText().toString()));
 
         fetchDoctorDetails();
         setupBackButton();
-    }
-
-    private void initializeViews() {
-        doctorName = findViewById(R.id.doctor_detail_name);
-        doctorSpecialization = findViewById(R.id.doctor_detail_specialization);
-        doctorEmail = findViewById(R.id.doctor_detail_email);
-        doctorPhone = findViewById(R.id.doctor_detail_phone);
-        doctorGender = findViewById(R.id.doctor_detail_gender);
-        doctorCity = findViewById(R.id.doctor_detail_city);
-        doctorID = findViewById(R.id.doctor_detail_id);
-        doctorAvatar = findViewById(R.id.doctor_detail_avatar);
-        progressBar = findViewById(R.id.doctor_detail_progress);
-        bookappointment = findViewById(R.id.bookappointment);
-        requestButton = findViewById(R.id.requestButton);
     }
 
     private void sendChatRequest() {
         String patientId = auth.getCurrentUser().getUid();
         DatabaseReference requestsRef = database.getReference("chat_requests");
 
-        // First check if request already exists
         requestsRef.orderByChild("patientId").equalTo(patientId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -100,7 +77,6 @@ public class DoctorDetailsActivity extends AppCompatActivity {
                                 }
                             }
                         }
-                        // If no existing request found, create new request
                         createNewChatRequest(patientId, requestsRef);
                     }
 
@@ -112,7 +88,6 @@ public class DoctorDetailsActivity extends AppCompatActivity {
     }
 
     private void createNewChatRequest(String patientId, DatabaseReference requestsRef) {
-        // Get current user (patient) details
         database.getReference("patient").child(patientId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -128,7 +103,6 @@ public class DoctorDetailsActivity extends AppCompatActivity {
                                     System.currentTimeMillis(),
                                     "pending"
                             );
-
                             requestsRef.child(requestId).setValue(chatRequest)
                                     .addOnSuccessListener(aVoid -> showToast("Chat request sent successfully"))
                                     .addOnFailureListener(e -> showToast("Failed to send chat request: " + e.getMessage()));
@@ -141,33 +115,26 @@ public class DoctorDetailsActivity extends AppCompatActivity {
                     }
                 });
     }
+
     private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
-    
+
     private void copyToClipboard(String patientId) {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("Doctor ID", patientId);
         clipboard.setPrimaryClip(clip);
-
-        // Show a toast message for user feedback
         Toast.makeText(this, "Doctor ID copied to clipboard", Toast.LENGTH_SHORT).show();
     }
 
     private void showBookingDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.book_appointment, null);
-        builder.setView(dialogView);
-
-        TextView dateText = dialogView.findViewById(R.id.dateText);
-        TextView timeText = dialogView.findViewById(R.id.timeText);
-        Button selectDateBtn = dialogView.findViewById(R.id.selectDateBtn);
-        Button selectTimeBtn = dialogView.findViewById(R.id.selectTimeBtn);
+        BookAppointmentBinding dialogBinding = BookAppointmentBinding.inflate(getLayoutInflater());
+        builder.setView(dialogBinding.getRoot());
 
         AlertDialog dialog = builder.create();
 
-        selectDateBtn.setOnClickListener(v -> {
+        dialogBinding.selectDateBtn.setOnClickListener(v -> {
             final Calendar c = Calendar.getInstance();
             int year = c.get(Calendar.YEAR);
             int month = c.get(Calendar.MONTH);
@@ -176,14 +143,14 @@ public class DoctorDetailsActivity extends AppCompatActivity {
             datePickerDialog = new DatePickerDialog(this,
                     (view, year1, monthOfYear, dayOfMonth) -> {
                         String selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year1;
-                        dateText.setText(selectedDate);
+                        dialogBinding.dateText.setText(selectedDate);
                     }, year, month, day);
 
             datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
             datePickerDialog.show();
         });
 
-        selectTimeBtn.setOnClickListener(v -> {
+        dialogBinding.selectTimeBtn.setOnClickListener(v -> {
             final Calendar c = Calendar.getInstance();
             int hour = c.get(Calendar.HOUR_OF_DAY);
             int minute = c.get(Calendar.MINUTE);
@@ -191,14 +158,14 @@ public class DoctorDetailsActivity extends AppCompatActivity {
             timePickerDialog = new TimePickerDialog(this,
                     (view, hourOfDay, minute1) -> {
                         String selectedTime = String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute1);
-                        timeText.setText(selectedTime);
+                        dialogBinding.timeText.setText(selectedTime);
                     }, hour, minute, false);
             timePickerDialog.show();
         });
 
         dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Book", (dialog1, which) -> {
-            String date = dateText.getText().toString();
-            String time = timeText.getText().toString();
+            String date = dialogBinding.dateText.getText().toString();
+            String time = dialogBinding.timeText.getText().toString();
 
             if (!date.isEmpty() && !time.isEmpty()) {
                 bookAppointment(date, time);
@@ -234,7 +201,6 @@ public class DoctorDetailsActivity extends AppCompatActivity {
                 );
     }
 
-
     private void fetchDoctorDetails() {
         showLoading(true);
         DatabaseReference doctorRef = database.getReference("doctor").child(doctorId);
@@ -264,23 +230,21 @@ public class DoctorDetailsActivity extends AppCompatActivity {
     }
 
     private void updateUI(Users doctor) {
-        doctorName.setText(doctor.getDoctor_name());
-        doctorSpecialization.setText(doctor.getDoctor_specialization());
-        doctorEmail.setText(doctor.getDoctor_email());
-        doctorPhone.setText(doctor.getDoctor_contactno());
-        doctorGender.setText(doctor.getDoctor_gender());
-        doctorCity.setText(doctor.getDoctor_city());
-        doctorID.setText(doctor.getDoctor_id());
-
-        doctorAvatar.setImageResource(R.drawable.doctoravatar3);
+        binding.doctorDetailName.setText(doctor.getDoctor_name());
+        binding.doctorDetailSpecialization.setText(doctor.getDoctor_specialization());
+        binding.doctorDetailEmail.setText(doctor.getDoctor_email());
+        binding.doctorDetailPhone.setText(doctor.getDoctor_contactno());
+        binding.doctorDetailGender.setText(doctor.getDoctor_gender());
+        binding.doctorDetailCity.setText(doctor.getDoctor_city());
+        binding.doctorDetailId.setText(doctor.getDoctor_id());
+        binding.doctorDetailAvatar.setImageResource(R.drawable.doctor3);
     }
 
     private void showLoading(boolean show) {
-        progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+        binding.doctorDetailProgress.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     private void setupBackButton() {
-        ImageButton backButton = findViewById(R.id.doctor_detail_back);
-        backButton.setOnClickListener(v -> finish());
+        binding.doctorDetailBack.setOnClickListener(v -> finish());
     }
 }

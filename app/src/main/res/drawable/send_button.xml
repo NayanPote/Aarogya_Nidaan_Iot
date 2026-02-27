@@ -2,13 +2,13 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="true">
         <shape android:shape="rectangle">
-            <solid android:color="#303B43"/>  <!-- Darker blue when pressed -->
+            <solid android:color="#492B33"/>
             <corners android:radius="12dp"/>
         </shape>
     </item>
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#4C5F73"/>  <!-- Normal blue color -->
+            <solid android:color="#C51E38"/>
             <corners android:radius="12dp"/>
         </shape>
     </item>

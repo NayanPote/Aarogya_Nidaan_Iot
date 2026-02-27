@@ -1,5 +1,7 @@
 <resources>
+    <string name="Developer">Nayan Pote</string>
     <string name="app_name">Aarogya Nidaan</string>
+    <string name="tagline">True Diagnosis for Wellness</string>
     <string name="open">Open Drawer</string>
     <string name="close">Close Drawer</string>
     <string name="title_activity_nearby_hospitals">NearbyHospitalsActivity</string>

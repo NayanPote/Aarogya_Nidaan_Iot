@@ -5,6 +5,9 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -22,9 +25,15 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
@@ -40,6 +49,8 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -55,12 +66,15 @@ import java.util.List;
 public class doctordashboard extends AppCompatActivity {
     private static final String SHARED_PREFS = "sharedPrefs";
     private DrawerLayout doctorDrawerLayout;
-    private ImageView docNavToggle;
     private ImageView docChat, docnoti;
     private FirebaseAuth auth;
     private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
     private TextView chatBadge;
     private AlertDialog logoutDialog;
+
+    private MaterialButton docNavToggle;
+
+    private FloatingActionButton navchatbot;
 
     private List<Article> articlesList = new ArrayList<>();
     private ArticleAdapter articleAdapter;
@@ -86,6 +100,7 @@ public class doctordashboard extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         chatBadge = findViewById(R.id.chatBadge);
         ProgressBar progressBar = findViewById(R.id.progressBar);
+        navchatbot = findViewById(R.id.navchatbot);
 
         setupNavigationView();
         setupChatNotificationBadge();
@@ -110,10 +125,9 @@ public class doctordashboard extends AppCompatActivity {
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
 
-        findViewById(R.id.docnoti).setOnClickListener(v -> {
-            Intent intent = new Intent(doctordashboard.this, DoctorNotificationActivity.class);
+        navchatbot.setOnClickListener(view -> {
+            Intent intent = new Intent(getApplicationContext(), chatbot.class);
             startActivity(intent);
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
 
         // Get the current user's ID
@@ -288,9 +302,10 @@ public class doctordashboard extends AppCompatActivity {
                 activity.articlesList.clear();
                 activity.articlesList.addAll(articles);
                 activity.articleAdapter.notifyDataSetChanged();
-            } else {
-                Toast.makeText(activity, "Failed to load articles", Toast.LENGTH_SHORT).show();
             }
+//            else {
+//                Toast.makeText(activity, "Failed to load articles", Toast.LENGTH_SHORT).show();
+//            }
         }
     }
 
@@ -353,22 +368,51 @@ public class doctordashboard extends AppCompatActivity {
                 return true;
             } else if (id == R.id.doctorshare) {
                 try {
-                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                    shareIntent.setType("text/plain");
+                    ApplicationInfo app = getApplicationContext().getApplicationInfo();
+                    String filePath = app.sourceDir;
+                    File originalApk = new File(filePath);
 
-                    String packageName = getApplicationContext().getPackageName();
+                    if (originalApk.exists()) {
+                        // Create a copy in external files directory
+                        File externalDir = new File(getExternalFilesDir(null), "shared_apk");
+                        if (!externalDir.exists()) {
+                            externalDir.mkdirs();
+                        }
 
-                    String shareMessage = "Check out this Aarogya Nidaan app!\n\n";
-                    shareMessage += "https://play.google.com/store/apps/details?id=" + packageName;
+                        // Create APK file with proper name
+                        File copiedApk = new File(externalDir, "AarogyaNidaan_v" + getVersionName() + ".apk");
 
-                    shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Share Aarogya Nidaan App");
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
+                        // Copy the APK file
+                        if (copyApkFile(originalApk, copiedApk)) {
+                            // Use FileProvider to share
+                            Uri apkUri = FileProvider.getUriForFile(this,
+                                    getPackageName() + ".fileprovider", copiedApk);
 
-                    startActivity(Intent.createChooser(shareIntent, "Share via"));
-                    return true;
+                            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                            shareIntent.setType("application/vnd.android.package-archive");
+                            shareIntent.putExtra(Intent.EXTRA_STREAM, apkUri);
+                            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "AarogyaNidaan");
+                            shareIntent.putExtra(Intent.EXTRA_TEXT,
+                                    "🎵 Aarogya Nidaan\n\n" +
+                                            "📱 Install the attached APK file\n" +
+                                            "⚠️ You may need to enable 'Install from Unknown Sources' in your device settings\n\n" +
+                                            "Developed with ❤ Passion by Nayan Pote\n" +
+                                            "File: " + copiedApk.getName());
+
+                            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            shareIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+                            startActivity(Intent.createChooser(shareIntent, "Share Aarogya Nidaan APK"));
+                            showCustomToast("Sharing Aarogya Nidaan APK file...");
+                        } else {
+                            showCustomToast("Failed to prepare APK file for sharing");
+                        }
+                    } else {
+                        showCustomToast("APK file not found");
+                    }
                 } catch (Exception e) {
-                    Toast.makeText(doctordashboard.this, "Error while sharing", Toast.LENGTH_SHORT).show();
-                    return false;
+                    e.printStackTrace();
+                    showCustomToast("Unable to share app file: " + e.getMessage());
                 }
             }else if (id == R.id.doctoraboutus) {
                 showinformationDialog();
@@ -379,6 +423,49 @@ public class doctordashboard extends AppCompatActivity {
             }
             return false;
         });
+    }
+
+    private void showCustomToast(String message) {
+        Toast toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+        toast.show();
+    }
+
+    private boolean copyApkFile(File source, File destination) {
+        try {
+            // Delete existing file if it exists
+            if (destination.exists()) {
+                destination.delete();
+            }
+
+            FileInputStream inStream = new FileInputStream(source);
+            FileOutputStream outStream = new FileOutputStream(destination);
+
+            byte[] buffer = new byte[8192]; // 8KB buffer for better performance
+            int bytesRead;
+
+            while ((bytesRead = inStream.read(buffer)) != -1) {
+                outStream.write(buffer, 0, bytesRead);
+            }
+
+            inStream.close();
+            outStream.close();
+
+            // Verify the copy was successful
+            return destination.exists() && destination.length() > 0;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private String getVersionName() {
+        try {
+            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            return packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            return "1.0";
+        }
     }
 
     private void showinformationDialog() {

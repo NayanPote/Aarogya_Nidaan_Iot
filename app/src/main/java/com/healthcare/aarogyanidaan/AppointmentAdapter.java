@@ -64,7 +64,7 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
         holder.TimeText.setText(timeIn12HourFormat);
 
         // Set status text
-        holder.statusText.setText(String.format("Status: %s", appointment.getStatus()));
+        holder.statusText.setText(String.format("%s", appointment.getStatus()));
 
         // Update countdown
         updateCountdown(holder.countdownText, appointment.getDate(), appointment.getTime());
@@ -73,7 +73,7 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
         holder.cancelButton.setOnClickListener(v -> showCancelDialog(appointment));
     }
 
-    // Convert 24-hour time to 12-hour format
+    // 12-hour format
     private String convertTo12HourFormat(String time) {
         try {
             SimpleDateFormat sdf24 = new SimpleDateFormat("HH:mm", Locale.getDefault());
@@ -187,7 +187,7 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
             statusText = itemView.findViewById(R.id.statusText);
             countdownText = itemView.findViewById(R.id.countdownText);
             cancelButton = itemView.findViewById(R.id.cancelButton);
-            patientId = itemView.findViewById(R.id.patientId);
+            patientId = itemView.findViewById(R.id.patientid);
         }
     }
 }

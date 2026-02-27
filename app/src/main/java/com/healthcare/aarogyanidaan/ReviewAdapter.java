@@ -4,13 +4,8 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.RatingBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,6 +18,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.healthcare.aarogyanidaan.databinding.ItemReviewBinding;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -33,14 +29,14 @@ import java.util.Random;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder> {
 
-    private Context context;
-    private List<ReviewModel> reviews;
-    private String currentUserType;
-    private String currentUserId;
-    private String currentUserName;
-    private DatabaseReference mDatabase;
+    private final Context context;
+    private final List<ReviewModel> reviews;
+    private final String currentUserType;
+    private final String currentUserId;
+    private final String currentUserName;
+    private final DatabaseReference mDatabase;
 
-    private int[] avatarColors = new int[] {
+    private final int[] avatarColors = new int[]{
             android.graphics.Color.parseColor("#4CAF50"),
             android.graphics.Color.parseColor("#2196F3"),
             android.graphics.Color.parseColor("#FF9800"),
@@ -48,7 +44,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
             android.graphics.Color.parseColor("#F44336"),
             android.graphics.Color.parseColor("#009688")
     };
-    private Random random = new Random();
+    private final Random random = new Random();
 
     // Constructor for regular users
     public ReviewAdapter(Context context, List<ReviewModel> reviews) {
@@ -57,6 +53,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         this.currentUserType = "patient"; // Default to patient
         this.currentUserId = "";
         this.currentUserName = "";
+        this.mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
     // Constructor with user information for admin functionality
@@ -72,73 +69,76 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
     @NonNull
     @Override
     public ReviewViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_review, parent, false);
-        return new ReviewViewHolder(view);
+        // Use View Binding to inflate layout
+        ItemReviewBinding binding = ItemReviewBinding.inflate(LayoutInflater.from(context), parent, false);
+        return new ReviewViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ReviewViewHolder holder, int position) {
         ReviewModel review = reviews.get(position);
+        ItemReviewBinding binding = holder.binding;
 
-        // Check for null values before using them
-        String userName = (review.getUserName() != null) ? review.getUserName() : "Anonymous";
-        String userType = (review.getUserType() != null) ? review.getUserType() : "";
-        String userIdentifier = (review.getUserIdentifier() != null) ? review.getUserIdentifier() : "N/A";
-        String reviewText = (review.getReview() != null) ? review.getReview() : "";
+        // Safe data access with defaults
+        String userName = review.getUserName() != null ? review.getUserName() : "Anonymous";
+        String userType = review.getUserType() != null ? review.getUserType() : "";
+        String userIdentifier = review.getUserIdentifier() != null ? review.getUserIdentifier() : "N/A";
+        String reviewText = review.getReview() != null ? review.getReview() : "";
 
-        // Set avatar based on user type
+        // Set avatar image by userType
+        ShapeableImageView avatarView = binding.imgUserAvatar;
         if ("doctor".equals(userType)) {
-            holder.imgUserAvatar.setImageResource(R.drawable.doctoravatar2);
+            avatarView.setImageResource(R.drawable.doctor3);
         } else {
-            holder.imgUserAvatar.setImageResource(R.drawable.patientavatar2);
+            avatarView.setImageResource(R.drawable.patient);
         }
 
-        // Set background color for the avatar
-        holder.imgUserAvatar.setBackgroundColor(
+        // Background color for avatar based on userName hash
+        avatarView.setBackgroundColor(
                 avatarColors[Math.abs(userName.hashCode()) % avatarColors.length]
         );
 
-        // Set reviewer information
+        // Reviewer Info
         if ("doctor".equals(userType)) {
-            holder.tvReviewerName.setText("Dr. " + userName);
+            binding.tvReviewerName.setText("Dr. " + userName);
         } else {
-            holder.tvReviewerName.setText(userName);
+            binding.tvReviewerName.setText(userName);
         }
-        holder.tvReviewerId.setText(userIdentifier);
+        binding.tvReviewerId.setText(userIdentifier);
 
-        // Set rating safely
+        // Rating safely
         Float rating = review.getRating();
-        holder.ratingBarReview.setRating((rating != null) ? rating : 0.0f);
+        binding.ratingBarReview.setRating(rating != null ? rating : 0f);
 
-        // Format date for display safely
-        String formattedDate = (review.getFormattedDate() != null) ? formatDate(review.getFormattedDate()) : "Unknown Date";
-        holder.tvReviewDate.setText(formattedDate);
+        // Format and set review date
+        String formattedDate = review.getFormattedDate() != null ? formatDate(review.getFormattedDate()) : "Unknown Date";
+        binding.tvReviewDate.setText(formattedDate);
 
-        // Set review content
+        // Review content visibility
         if (!reviewText.isEmpty()) {
-            holder.tvReviewContent.setText(reviewText);
-            holder.tvReviewContent.setVisibility(View.VISIBLE);
+            binding.tvReviewContent.setText(reviewText);
+            binding.tvReviewContent.setVisibility(android.view.View.VISIBLE);
         } else {
-            holder.tvReviewContent.setVisibility(View.GONE);
+            binding.tvReviewContent.setVisibility(android.view.View.GONE);
         }
 
-        // Handle admin reply
+        // Admin reply section
         if (review.getAdminReply() != null) {
-            holder.layoutAdminReply.setVisibility(View.VISIBLE);
-            holder.tvAdminReplyName.setText("Admin: " + review.getAdminReply().getAdminName());
-            holder.tvAdminReplyDate.setText(formatDate(review.getAdminReply().getFormattedDate()));
-            holder.tvAdminReplyContent.setText(review.getAdminReply().getReplyContent());
+            binding.layoutAdminReply.setVisibility(android.view.View.VISIBLE);
+            binding.tvAdminReplyName.setText("Admin: " + review.getAdminReply().getAdminName());
+            binding.tvAdminReplyDate.setText(formatDate(review.getAdminReply().getFormattedDate()));
+            binding.tvAdminReplyContent.setText(review.getAdminReply().getReplyContent());
         } else {
-            holder.layoutAdminReply.setVisibility(View.GONE);
+            binding.layoutAdminReply.setVisibility(android.view.View.GONE);
         }
 
-        // Show add/edit reply option only for admins
+        // Add/Edit reply button only for admins
         if ("admin".equals(currentUserType)) {
-            holder.btnAddReply.setVisibility(View.VISIBLE);
-            holder.btnAddReply.setText(review.getAdminReply() != null ? "Edit Reply" : "Add Reply");
-            holder.btnAddReply.setOnClickListener(v -> showReplyDialog(review));
+            binding.btnAddReply.setVisibility(android.view.View.VISIBLE);
+            binding.btnAddReply.setText(review.getAdminReply() != null ? "Edit Reply" : "Add Reply");
+            binding.btnAddReply.setOnClickListener(v -> showReplyDialog(review));
         } else {
-            holder.btnAddReply.setVisibility(View.GONE);
+            binding.btnAddReply.setVisibility(android.view.View.GONE);
         }
     }
 
@@ -147,7 +147,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         return reviews.size();
     }
 
-    // Helper method to format date
+    // Format date helper
     private String formatDate(String timestampStr) {
         try {
             SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
@@ -164,20 +164,20 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Admin Reply");
 
-        // Set up the input
+        // Use EditText for multi-line input
         final EditText input = new EditText(context);
         input.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         input.setLines(5);
         input.setGravity(Gravity.TOP | Gravity.START);
 
-        // Pre-fill with existing reply if any
+        // Pre-fill with existing reply content, if any
         if (review.getAdminReply() != null) {
             input.setText(review.getAdminReply().getReplyContent());
         }
 
         builder.setView(input);
 
-        // Set up the buttons
+        // Buttons
         builder.setPositiveButton("Submit", (dialog, which) -> {
             String replyContent = input.getText().toString().trim();
             if (!TextUtils.isEmpty(replyContent)) {
@@ -196,10 +196,12 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         reply.setAdminName(currentUserName);
         reply.setReplyContent(replyContent);
         reply.setTimestamp(System.currentTimeMillis());
-        reply.setFormattedDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                .format(new Date()));
 
-        // Find the review in the database and update it
+        String formattedDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                .format(new Date());
+        reply.setFormattedDate(formattedDate);
+
+        // Find review by timestamp and update adminReply
         mDatabase.child("reviews").orderByChild("timestamp").equalTo(review.getTimestamp())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -211,7 +213,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
                                         .setValue(reply)
                                         .addOnSuccessListener(aVoid -> {
                                             Toast.makeText(context, "Reply submitted successfully", Toast.LENGTH_SHORT).show();
-                                            // Update the review object in the list and notify adapter
+                                            // Update local review and refresh
                                             review.setAdminReply(reply);
                                             notifyDataSetChanged();
                                         })
@@ -229,30 +231,13 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
                 });
     }
 
+    // ViewHolder with View Binding
     static class ReviewViewHolder extends RecyclerView.ViewHolder {
-        ShapeableImageView imgUserAvatar;
-        TextView tvReviewerName, tvReviewerId, tvReviewDate, tvReviewContent;
-        RatingBar ratingBarReview;
-        // Admin reply components
-        LinearLayout layoutAdminReply;
-        TextView tvAdminReplyName, tvAdminReplyDate, tvAdminReplyContent;
-        Button btnAddReply;
+        final ItemReviewBinding binding;
 
-        public ReviewViewHolder(@NonNull View itemView) {
-            super(itemView);
-            imgUserAvatar = itemView.findViewById(R.id.imgUserAvatar);
-            tvReviewerName = itemView.findViewById(R.id.tvReviewerName);
-            tvReviewerId = itemView.findViewById(R.id.tvReviewerId);
-            tvReviewDate = itemView.findViewById(R.id.tvReviewDate);
-            tvReviewContent = itemView.findViewById(R.id.tvReviewContent);
-            ratingBarReview = itemView.findViewById(R.id.ratingBarReview);
-
-            // Admin reply components
-            layoutAdminReply = itemView.findViewById(R.id.layoutAdminReply);
-            tvAdminReplyName = itemView.findViewById(R.id.tvAdminReplyName);
-            tvAdminReplyDate = itemView.findViewById(R.id.tvAdminReplyDate);
-            tvAdminReplyContent = itemView.findViewById(R.id.tvAdminReplyContent);
-            btnAddReply = itemView.findViewById(R.id.btnAddReply);
+        public ReviewViewHolder(@NonNull ItemReviewBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
     }
 }

@@ -7,12 +7,12 @@
     android:orientation="vertical"
     android:id="@+id/main">
 
-    <!-- Toolbar -->
+    <!-- ── Toolbar ──────────────────────────────────────────────────────────── -->
     <Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
+        android:background="@color/background_light"
         android:elevation="4dp">
 
         <ImageButton
@@ -20,15 +20,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/transparent"
-            android:src="@drawable/back"/>
+            android:src="@drawable/back"
+            android:padding="10dp"
+            app:tint="@color/main_dark" />
 
-        <!-- Report Header -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Health REPORT"
+            android:text="Health Report"
             android:textSize="24sp"
-            android:textColor="@color/white"
+            android:textColor="@color/main_dark"
             android:textStyle="bold"
             android:layout_gravity="center"
             android:gravity="center"
@@ -42,13 +43,15 @@
             android:background="@color/transparent"
             android:layout_gravity="right"
             android:layout_marginEnd="25dp"
-            app:tint="@color/white" />
+            app:tint="@color/main_dark"
+            android:padding="10dp"/>
 
     </Toolbar>
 
-    <ScrollView android:layout_width="match_parent"
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white">
+        android:background="@color/background_light">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -56,8 +59,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-
-            <!-- Patient Information Section -->
+            <!-- ── Patient Information ──────────────────────────────────────── -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -72,159 +74,420 @@
                 android:stretchColumns="1">
 
                 <TableRow>
-                    <TextView android:text="Patient's Name: " android:textStyle="bold"/>
-                    <TextView android:id="@+id/patientNameText"/>
+                    <TextView android:text="Patient's Name: " android:textStyle="bold" android:padding="4dp"/>
+                    <TextView android:id="@+id/patientNameText" android:padding="4dp"/>
                 </TableRow>
 
                 <TableRow>
-                    <TextView android:text="Patient ID: " android:textStyle="bold"/>
-                    <TextView android:id="@+id/PatientId"/>
+                    <TextView android:text="Patient ID: " android:textStyle="bold" android:padding="4dp"/>
+                    <TextView android:id="@+id/PatientId" android:padding="4dp"/>
                 </TableRow>
 
                 <TableRow>
-                    <TextView android:text="Patients's Age: " android:textStyle="bold"/>
-                    <TextView android:id="@+id/patientage"/>
+                    <TextView android:text="Patient's Age: " android:textStyle="bold" android:padding="4dp"/>
+                    <TextView android:id="@+id/patientage" android:padding="4dp"/>
                 </TableRow>
 
                 <TableRow>
-                    <TextView android:text="Date: " android:textStyle="bold"/>
-                    <TextView android:id="@+id/reportDate"/>
+                    <TextView android:text="Date: " android:textStyle="bold" android:padding="4dp"/>
+                    <TextView android:id="@+id/reportDate" android:padding="4dp"/>
                 </TableRow>
 
                 <TableRow>
-                    <TextView android:text="Time: " android:textStyle="bold"/>
-                    <TextView android:id="@+id/reportTime"/>
+                    <TextView android:text="Time: " android:textStyle="bold" android:padding="4dp"/>
+                    <TextView android:id="@+id/reportTime" android:padding="4dp"/>
                 </TableRow>
+
             </TableLayout>
 
-            <!-- Vital Signs Section -->
+            <!-- ── Vital Signs (single unified section) ─────────────────────── -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="VITAL SIGNS"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="24dp"
                 android:layout_marginBottom="12dp"/>
 
-            <TableLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:stretchColumns="*">
+                android:orientation="vertical"
+                android:background="@android:color/white"
+                android:elevation="4dp">
 
-                <TableRow android:background="#B3B3B3">
-                    <TextView android:text="Parameter" android:textStyle="bold" android:padding="4dp"/>
-                    <TextView android:text="Value" android:textStyle="bold" android:padding="4dp"/>
-                    <TextView android:text="Normal Range" android:textStyle="bold" android:padding="4dp"/>
-                </TableRow>
+                <!-- Table Header Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="#F5F5F5"
+                    android:padding="10dp">
 
-                <TableRow>
-                    <TextView android:text="Temperature" android:padding="4dp"/>
-                    <TextView android:id="@+id/temperatureValueText" android:padding="4dp"/>
-                    <TextView android:text="36.5-37.5°C" android:padding="4dp"/>
-                </TableRow>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:text="Parameter"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"/>
 
-                <TableRow android:background="#E6E6E6">
-                    <TextView android:text="Heart Rate" android:padding="4dp"/>
-                    <TextView android:id="@+id/heartRateValueText" android:padding="4dp"/>
-                    <TextView android:text="60-100 bpm" android:padding="4dp"/>
-                </TableRow>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.5"
+                        android:text="Reading"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:gravity="center"/>
 
-                <TableRow>
-                    <TextView android:text="Blood Pressure" android:padding="4dp"/>
-                    <TextView android:id="@+id/bloodPressureValueText" android:padding="4dp"/>
-                    <TextView android:text="120/80 mmHg" android:padding="4dp"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Status"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:gravity="center"/>
 
-                </TableRow>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:text="Last Updated"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:textColor="#333333"
+                        android:gravity="end"/>
+                </LinearLayout>
 
-                <TableRow android:background="#E6E6E6">
-                    <TextView android:text="Oxygen Saturation" android:padding="4dp"/>
-                    <TextView android:id="@+id/oxygenSaturationValueText" android:padding="4dp"/>
-                    <TextView android:text="95-100%" android:padding="4dp"/>
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#E0E0E0"/>
 
-                </TableRow>
+                <!-- Heart Rate Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="10dp"
+                    android:gravity="center_vertical">
 
-                <TableRow>
-                    <TextView android:text="Respiratory Rate" android:padding="4dp"/>
-                    <TextView android:id="@+id/respiratoryrateValueText" android:padding="4dp"/>
-                    <TextView android:text="12-20 RPM" android:padding="4dp"/>
-                </TableRow>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:orientation="vertical">
 
-                <TableRow android:background="#E6E6E6">
-                    <TextView android:text="Pulse Rate" android:padding="4dp"/>
-                    <TextView android:id="@+id/pulserateValueText" android:padding="4dp"/>
-                    <TextView android:text="60-100 BPM" android:padding="4dp"/>
-                </TableRow>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Heart Rate"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:textColor="#333333"/>
 
-                <TableRow>
-                    <TextView android:text="Sweat Rate" android:padding="4dp"/>
-                    <TextView android:id="@+id/sweatrateValueText" android:padding="4dp"/>
-                    <TextView android:text="0.8-1.4 L/hr" android:padding="4dp"/>
-                </TableRow>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Normal: 60–100 bpm"
+                            android:textSize="10sp"
+                            android:textColor="#9E9E9E"/>
+                    </LinearLayout>
 
-                <TableRow android:background="#E6E6E6">
-                    <TextView android:text="Sleep Duration" android:padding="4dp"/>
-                    <TextView android:id="@+id/sleepdataValueText" android:padding="4dp"/>
-                    <TextView android:text="7-9 hrs" android:padding="4dp"/>
-                </TableRow>
+                    <TextView
+                        android:id="@+id/heartRateValueText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.5"
+                        android:text="-- bpm"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#9E9E9E"
+                        android:gravity="center"/>
 
-                <TableRow>
-                    <TextView android:text="Pulse Transit Time" android:padding="4dp"/>
-                    <TextView android:id="@+id/pulsetransittimeValueText" android:padding="4dp"/>
-                    <TextView android:text="200-280 ms" android:padding="4dp"/>
+                    <TextView
+                        android:id="@+id/heartRateStatusText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="● Waiting…"
+                        android:textSize="11sp"
+                        android:textColor="#9E9E9E"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
 
-                </TableRow>
-            </TableLayout>
+                    <TextView
+                        android:id="@+id/heartRateLastUpdate"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:text="No data yet"
+                        android:textSize="10sp"
+                        android:textColor="#9E9E9E"
+                        android:gravity="end"/>
+                </LinearLayout>
 
-            <!-- Laboratory Values Section -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="LABORATORY VALUES"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="12dp"/>
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F0F0F0"/>
 
-            <TableLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:stretchColumns="*">
+                <!-- Temperature Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="10dp"
+                    android:gravity="center_vertical">
 
-                <TableRow android:background="#B3B3B3">
-                    <TextView android:text="Test" android:textStyle="bold" android:padding="4dp"/>
-                    <TextView android:text="Result" android:textStyle="bold" android:padding="4dp"/>
-                    <TextView android:text="Reference Range" android:textStyle="bold" android:padding="4dp"/>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:orientation="vertical">
 
-                </TableRow>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Temperature"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:textColor="#333333"/>
 
-                <TableRow>
-                    <TextView android:text="Cholesterol" android:padding="4dp"/>
-                    <TextView android:id="@+id/cholesterollevelsValueText" android:padding="4dp"/>
-                    <TextView android:text="&lt;200 mg/dL" android:padding="4dp"/>
-                </TableRow>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Normal: 36.5–37.5°C"
+                            android:textSize="10sp"
+                            android:textColor="#9E9E9E"/>
+                    </LinearLayout>
 
-                <TableRow android:background="#E6E6E6">
-                    <TextView android:text="Hemoglobin" android:padding="4dp"/>
-                    <TextView android:id="@+id/hemoglobinlevelsValueText" android:padding="4dp"/>
-                    <TextView android:text="13.5-17.5 g/dL" android:padding="4dp"/>
-                </TableRow>
+                    <TextView
+                        android:id="@+id/temperatureValueText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.5"
+                        android:text="-- °C"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#9E9E9E"
+                        android:gravity="center"/>
 
-                <TableRow>
-                    <TextView android:text="Electrolytes" android:padding="4dp"/>
-                    <TextView android:id="@+id/electrolytelevelsValueText" android:padding="4dp"/>
-                    <TextView android:text="135-145 mmol/L" android:padding="4dp"/>
-                </TableRow>
-            </TableLayout>
+                    <TextView
+                        android:id="@+id/temperatureStatusText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="● Waiting…"
+                        android:textSize="11sp"
+                        android:textColor="#9E9E9E"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
 
-            <!-- Comments Section -->
+                    <TextView
+                        android:id="@+id/temperatureLastUpdate"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:text="No data yet"
+                        android:textSize="10sp"
+                        android:textColor="#9E9E9E"
+                        android:gravity="end"/>
+                </LinearLayout>
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F0F0F0"/>
+
+                <!-- Oxygen (SpO2) Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="10dp"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Oxygen (SpO2)"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:textColor="#333333"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Normal: 95–100%"
+                            android:textSize="10sp"
+                            android:textColor="#9E9E9E"/>
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/oxygenValueText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.5"
+                        android:text="-- %"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#9E9E9E"
+                        android:gravity="center"/>
+
+                    <TextView
+                        android:id="@+id/oxygenStatusText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="● Waiting…"
+                        android:textSize="11sp"
+                        android:textColor="#9E9E9E"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
+
+                    <TextView
+                        android:id="@+id/oxygenLastUpdate"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:text="No data yet"
+                        android:textSize="10sp"
+                        android:textColor="#9E9E9E"
+                        android:gravity="end"/>
+                </LinearLayout>
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F0F0F0"/>
+
+                <!-- Blood Pressure Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="10dp"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Blood Pressure"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:textColor="#333333"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Normal: 90/60–120/80"
+                            android:textSize="10sp"
+                            android:textColor="#9E9E9E"/>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="2dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="SYS: "
+                                android:textSize="10sp"
+                                android:textColor="#9E9E9E"/>
+
+                            <TextView
+                                android:id="@+id/systolicValueText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="--"
+                                android:textSize="10sp"
+                                android:textColor="#9E9E9E"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="  DIA: "
+                                android:textSize="10sp"
+                                android:textColor="#9E9E9E"/>
+
+                            <TextView
+                                android:id="@+id/diastolicValueText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="--"
+                                android:textSize="10sp"
+                                android:textColor="#9E9E9E"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/bloodPressureValueText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.5"
+                        android:text="--/-- mmHg"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#9E9E9E"
+                        android:gravity="center"/>
+
+                    <TextView
+                        android:id="@+id/bloodPressureStatusText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="● Waiting…"
+                        android:textSize="11sp"
+                        android:textColor="#9E9E9E"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
+
+                    <TextView
+                        android:id="@+id/bloodPressureLastUpdate"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:text="No data yet"
+                        android:textSize="10sp"
+                        android:textColor="#9E9E9E"
+                        android:gravity="end"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- ── Clinical Notes ────────────────────────────────────────────── -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="CLINICAL NOTES"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="24dp"
                 android:layout_marginBottom="12dp"/>
 
             <EditText
@@ -233,46 +496,57 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/border_background"
                 android:padding="8dp"
+                android:minLines="4"
+                android:gravity="top"
                 android:inputType="textMultiLine"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right">
+                android:layout_gravity="right"
+                android:layout_marginTop="8dp">
 
                 <ImageButton
                     android:id="@+id/clinicalNotessave"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/save"/>
+                    android:src="@drawable/save"
+                    android:background="@color/transparent"
+                    android:padding="8dp"/>
 
                 <ImageButton
                     android:id="@+id/clinicalNotesedit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/edit"/>
+                    android:src="@drawable/edit"
+                    android:background="@color/transparent"
+                    android:padding="8dp"/>
 
                 <ImageButton
                     android:id="@+id/clinicalNotesmic"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/mic"/>
+                    android:src="@drawable/mic"
+                    android:background="@color/transparent"
+                    android:padding="8dp"/>
 
             </LinearLayout>
 
-            <!-- Report Footer -->
+            <!-- ── Doctor Footer ─────────────────────────────────────────────── -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginTop="32dp">
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="16dp">
 
                 <TextView
                     android:id="@+id/doctorName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Doctor's Name"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold"
+                    android:textSize="14sp"/>
 
                 <TextView
                     android:id="@+id/doctorSignature"
@@ -280,9 +554,12 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
                     android:layout_marginBottom="20dp"
-                    android:text="Digital Signature"/>
+                    android:text="Digital Signature"
+                    android:textColor="#9E9E9E"/>
+
             </LinearLayout>
 
         </LinearLayout>
     </ScrollView>
+
 </LinearLayout>

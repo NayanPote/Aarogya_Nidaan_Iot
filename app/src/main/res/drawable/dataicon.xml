@@ -11,16 +11,16 @@
 
     <!-- First bar (left) -->
     <path
-        android:fillColor="#F29A00"
+        android:fillColor="#FFB22E"
         android:pathData="M9,17H7v-7h2V17z"/>
 
     <!-- Middle bar -->
     <path
-        android:fillColor="#63FF4D"
+        android:fillColor="#FFFFFF"
         android:pathData="M13,17h-2V7h2V17z"/>
 
     <!-- Right bar -->
     <path
-        android:fillColor="#004B68"
+        android:fillColor="#1AF87E"
         android:pathData="M17,17h-2v-4h2V17z"/>
 </vector>

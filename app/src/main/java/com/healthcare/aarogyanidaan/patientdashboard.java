@@ -1,27 +1,40 @@
 package com.healthcare.aarogyanidaan;
 
-import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
+import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -35,8 +48,12 @@ import com.healthcare.aarogyanidaan.databinding.ActivityPatientdashboardBinding;
 
 import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -92,6 +109,8 @@ public class patientdashboard extends AppCompatActivity {
         setupNavigationView();
         loadAppointments();
         setupClickListeners();
+        // Setup immersive notch handling with theme colors
+        setupImmersiveNotchHandling();
         drawerLayout = binding.drawerLayout;
 
         gestureManager = new GestureManager(this);
@@ -99,6 +118,59 @@ public class patientdashboard extends AppCompatActivity {
         // Attach to the root view
         View rootView = findViewById(android.R.id.content);
         gestureManager.attachToView(rootView);
+    }
+
+    private void setupImmersiveNotchHandling() {
+        // Enable edge-to-edge display
+        EdgeToEdge.enable(this);
+
+        Window window = getWindow();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Android 11+ - Modern approach
+            window.setDecorFitsSystemWindows(false);
+            window.setStatusBarColor(Color.TRANSPARENT);
+            window.setNavigationBarColor(Color.TRANSPARENT);
+
+            // Make system bars match your theme
+            window.getInsetsController().setSystemBarsAppearance(0,
+                    android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
+
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // Android 5.0+ - Legacy approach
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+
+            // Set transparent status bar to blend with your gradient
+            window.setStatusBarColor(Color.TRANSPARENT);
+            window.setNavigationBarColor(Color.TRANSPARENT);
+
+            // Make content extend behind system bars
+            window.getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            );
+        }
+
+        // Handle window insets to properly position content around notch
+        ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            Insets displayCutout = insets.getInsets(WindowInsetsCompat.Type.displayCutout());
+
+            // Calculate proper padding considering both system bars and display cutout
+            int topPadding = Math.max(systemBars.top, displayCutout.top);
+            int leftPadding = Math.max(systemBars.left, displayCutout.left);
+            int rightPadding = Math.max(systemBars.right, displayCutout.right);
+            int bottomPadding = Math.max(systemBars.bottom, displayCutout.bottom);
+
+            // Apply padding to main container
+            v.setPadding(leftPadding, topPadding, rightPadding, bottomPadding);
+
+            return insets;
+        });
+
     }
 
     private void loadHealthDataFromFirebase() {
@@ -188,7 +260,7 @@ public class patientdashboard extends AppCompatActivity {
 
         // Health data button
         binding.patienthealthdata.setOnClickListener(v ->
-                startActivity(new Intent(patientdashboard.this, patienthealthdata.class))
+                startActivity(new Intent(patientdashboard.this, PatienthealthdatadisplayActivity.class))
         );
 
         // Chatbot button
@@ -215,19 +287,22 @@ public class patientdashboard extends AppCompatActivity {
                 startActivity(new Intent(patientdashboard.this, patientchat.class))
         );
 
-        // Profile button
-        binding.patientprofile.setOnClickListener(v ->
-                startActivity(new Intent(patientdashboard.this, patientprofile.class))
-        );
     }
+
     private void setupArticlesRecyclerView() {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(
-                this, LinearLayoutManager.HORIZONTAL, false);
-        binding.articlesRecyclerView.setLayoutManager(layoutManager);
+        if (binding != null && binding.articlesRecyclerView != null) {
+            LinearLayoutManager layoutManager = new LinearLayoutManager(
+                    this, LinearLayoutManager.HORIZONTAL, false);
+            binding.articlesRecyclerView.setLayoutManager(layoutManager);
 
-        articleAdapter = new ArticleAdapter(this, articlesList, true);
-        binding.articlesRecyclerView.setAdapter(articleAdapter);
+            articleAdapter = new ArticleAdapter(this, articlesList, true);
+            binding.articlesRecyclerView.setAdapter(articleAdapter);
 
+            // Ensure RecyclerView is visible from start
+            binding.articlesRecyclerView.setVisibility(View.VISIBLE);
+        }
+
+        // Load articles after setting up RecyclerView
         loadHealthArticles();
     }
 
@@ -237,8 +312,17 @@ public class patientdashboard extends AppCompatActivity {
             healthNewsManager = new HealthNewsManager(this);
         }
 
-        if (binding != null && binding.articlesProgressBar != null) {
-            binding.articlesProgressBar.setVisibility(View.VISIBLE);
+        // Show progress bar only if articles list is empty
+        if (binding != null && (articlesList == null || articlesList.isEmpty())) {
+            if (binding.articlesProgressBar != null) {
+                binding.articlesProgressBar.setVisibility(View.VISIBLE);
+            }
+            if (binding.emptyarticletext != null) {
+                binding.emptyarticletext.setVisibility(View.GONE);
+            }
+            if (binding.articlesRecyclerView != null) {
+                binding.articlesRecyclerView.setVisibility(View.VISIBLE);
+            }
         }
 
         if (healthNewsManager != null) {
@@ -249,20 +333,34 @@ public class patientdashboard extends AppCompatActivity {
                         public void onArticlesLoaded(List<Article> articles) {
                             if (binding == null || isFinishing()) return;
 
+                            // Always hide progress bar first
                             if (binding.articlesProgressBar != null) {
                                 binding.articlesProgressBar.setVisibility(View.GONE);
                             }
 
                             if (articles != null && !articles.isEmpty()) {
+                                // Update articles list
                                 articlesList.clear();
                                 articlesList.addAll(articles);
-                                articleAdapter.notifyDataSetChanged();
+                                if (articleAdapter != null) {
+                                    articleAdapter.notifyDataSetChanged();
+                                }
 
-                                // Show articles section
-                                binding.emptyarticletext.setVisibility(View.GONE);
+                                // Show articles RecyclerView and hide empty text
+                                if (binding.articlesRecyclerView != null) {
+                                    binding.articlesRecyclerView.setVisibility(View.VISIBLE);
+                                }
+                                if (binding.emptyarticletext != null) {
+                                    binding.emptyarticletext.setVisibility(View.GONE);
+                                }
                             } else {
-                                // Hide articles section if no articles
-                                binding.emptyarticletext.setVisibility(View.VISIBLE);
+                                // Show empty message and keep RecyclerView visible but empty
+                                if (binding.emptyarticletext != null) {
+                                    binding.emptyarticletext.setVisibility(View.VISIBLE);
+                                }
+                                if (binding.articlesRecyclerView != null) {
+                                    binding.articlesRecyclerView.setVisibility(View.VISIBLE);
+                                }
                             }
                         }
 
@@ -270,12 +368,18 @@ public class patientdashboard extends AppCompatActivity {
                         public void onError(String message) {
                             if (binding == null || isFinishing()) return;
 
+                            // Hide progress bar
                             if (binding.articlesProgressBar != null) {
                                 binding.articlesProgressBar.setVisibility(View.GONE);
                             }
 
-                            // Hide articles section on error
-                            binding.emptyarticletext.setVisibility(View.VISIBLE);
+                            // Show empty text but keep RecyclerView visible
+                            if (binding.emptyarticletext != null) {
+                                binding.emptyarticletext.setVisibility(View.VISIBLE);
+                            }
+                            if (binding.articlesRecyclerView != null) {
+                                binding.articlesRecyclerView.setVisibility(View.VISIBLE);
+                            }
 
                             // Show a toast with the error message
                             Toast.makeText(patientdashboard.this,
@@ -283,20 +387,40 @@ public class patientdashboard extends AppCompatActivity {
                         }
                     }, 5);
         } else {
+            // Handle null healthNewsManager
+            if (binding != null) {
+                if (binding.articlesProgressBar != null) {
+                    binding.articlesProgressBar.setVisibility(View.GONE);
+                }
+                if (binding.emptyarticletext != null) {
+                    binding.emptyarticletext.setVisibility(View.VISIBLE);
+                }
+                if (binding.articlesRecyclerView != null) {
+                    binding.articlesRecyclerView.setVisibility(View.VISIBLE);
+                }
+            }
             Log.e("PatientDashboard", "HealthNewsManager is null");
         }
     }
 
-
     private void loadRssFeed() {
-        if (binding != null && binding.articlesProgressBar != null) {
-            binding.articlesProgressBar.setVisibility(View.VISIBLE);
+        // Show progress bar only if articles list is empty
+        if (binding != null && (articlesList == null || articlesList.isEmpty())) {
+            if (binding.articlesProgressBar != null) {
+                binding.articlesProgressBar.setVisibility(View.VISIBLE);
+            }
+            if (binding.emptyarticletext != null) {
+                binding.emptyarticletext.setVisibility(View.GONE);
+            }
+            if (binding.articlesRecyclerView != null) {
+                binding.articlesRecyclerView.setVisibility(View.VISIBLE);
+            }
         }
+
         new FetchRssTask(this).execute(
                 "https://www.health.harvard.edu/blog/feed",
                 "https://www.medicalnewstoday.com/newsfeeds/rss/medical_news_today.xml",
                 "https://rss.medicalnewstoday.com/fitness.xml"
-
         );
     }
 
@@ -320,28 +444,33 @@ public class patientdashboard extends AppCompatActivity {
                     conn.setConnectTimeout(15000);
                     conn.setRequestMethod("GET");
                     conn.setDoInput(true);
+                    conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Android)");
                     conn.connect();
 
-                    stream = conn.getInputStream();
-                    RssParser parser = new RssParser();
+                    int responseCode = conn.getResponseCode();
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        stream = conn.getInputStream();
+                        RssParser parser = new RssParser();
 
-                    List<Article> articles = parser.parse(stream, urlString);
+                        List<Article> articles = parser.parse(stream, urlString);
 
-                    int count = 0;
-                    for (Article article : articles) {
-                        result.add(article);
-                        count++;
-                        if (count >= 5) break;
+                        int count = 0;
+                        for (Article article : articles) {
+                            result.add(article);
+                            count++;
+                            if (count >= 5) break;
+                        }
                     }
 
                 } catch (IOException | XmlPullParserException e) {
+                    Log.e("FetchRssTask", "Error fetching RSS: " + e.getMessage());
                     e.printStackTrace();
                 } finally {
                     if (stream != null) {
                         try {
                             stream.close();
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            Log.e("FetchRssTask", "Error closing stream: " + e.getMessage());
                         }
                     }
                 }
@@ -354,25 +483,77 @@ public class patientdashboard extends AppCompatActivity {
             patientdashboard activity = activityReference.get();
             if (activity == null || activity.isFinishing()) return;
 
-            // Null check for binding before accessing
+            // Always hide progress bar when task completes
             if (activity.binding != null && activity.binding.articlesProgressBar != null) {
                 activity.binding.articlesProgressBar.setVisibility(View.GONE);
             }
 
             if (articles != null && !articles.isEmpty()) {
+                // Update articles list
                 activity.articlesList.clear();
                 activity.articlesList.addAll(articles);
-                activity.articleAdapter.notifyDataSetChanged();
+                if (activity.articleAdapter != null) {
+                    activity.articleAdapter.notifyDataSetChanged();
+                }
+
+                // Ensure RecyclerView is visible and hide empty text
+                if (activity.binding != null) {
+                    if (activity.binding.articlesRecyclerView != null) {
+                        activity.binding.articlesRecyclerView.setVisibility(View.VISIBLE);
+                    }
+                    if (activity.binding.emptyarticletext != null) {
+                        activity.binding.emptyarticletext.setVisibility(View.GONE);
+                    }
+                }
+            } else {
+                // Show empty message but keep RecyclerView visible
+                if (activity.binding != null) {
+                    if (activity.binding.articlesRecyclerView != null) {
+                        activity.binding.articlesRecyclerView.setVisibility(View.VISIBLE);
+                    }
+                    if (activity.binding.emptyarticletext != null) {
+                        activity.binding.emptyarticletext.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            patientdashboard activity = activityReference.get();
+            if (activity != null && activity.binding != null) {
+                // Hide progress bar if task is cancelled
+                if (activity.binding.articlesProgressBar != null) {
+                    activity.binding.articlesProgressBar.setVisibility(View.GONE);
+                }
+
+                // Keep RecyclerView visible and show empty message
+                if (activity.binding.articlesRecyclerView != null) {
+                    activity.binding.articlesRecyclerView.setVisibility(View.VISIBLE);
+                }
+                if (activity.binding.emptyarticletext != null) {
+                    activity.binding.emptyarticletext.setVisibility(View.VISIBLE);
+                }
             }
         }
     }
 
 
+    // Override onResume to ensure articles are loaded
     @Override
     protected void onResume() {
         super.onResume();
-        if (articlesList.isEmpty()) {
+
+        // Only reload if articles list is empty to avoid unnecessary API calls
+        if (articlesList == null || articlesList.isEmpty()) {
             loadHealthArticles();
+            loadRssFeed();
+        } else {
+            // Ensure RecyclerView is visible if we have articles
+            if (binding != null && binding.articlesRecyclerView != null) {
+                binding.articlesRecyclerView.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -391,9 +572,8 @@ public class patientdashboard extends AppCompatActivity {
         TextView headerName = headerView.findViewById(R.id.patientnavname);
         TextView headerEmail = headerView.findViewById(R.id.patientnavemail);
         TextView headerId = headerView.findViewById(R.id.patientnavid);
-        ImageView headerImage = headerView.findViewById(R.id.patientnavimg);
+        MaterialButton headerImage = headerView.findViewById(R.id.pat_edit_profile);
         ImageButton headerback = headerView.findViewById(R.id.back);
-
 
         headerback.setOnClickListener(view -> {
             if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -435,7 +615,8 @@ public class patientdashboard extends AppCompatActivity {
         });
 
         // Handle navigation menu item selection
-        navigationView.setNavigationItemSelectedListener(item -> {
+        // Handle navigation menu item selection
+        binding.navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
 
             if (id == R.id.patientlogout) {
@@ -445,24 +626,8 @@ public class patientdashboard extends AppCompatActivity {
                 startActivity(new Intent(patientdashboard.this, patienttermsandcondition.class));
                 return true;
             } else if (id == R.id.patientshare) {
-                try {
-                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                    shareIntent.setType("text/plain");
-
-                    String packageName = getApplicationContext().getPackageName();
-
-                    String shareMessage = "Check out this Aarogya Nidaan app!\n\n";
-                    shareMessage += "https://play.google.com/store/apps/details?id=" + packageName;
-
-                    shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Share Aarogya Nidaan App");
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
-
-                    startActivity(Intent.createChooser(shareIntent, "Share via"));
-                    return true;
-                } catch (Exception e) {
-                    Toast.makeText(patientdashboard.this, "Error while sharing", Toast.LENGTH_SHORT).show();
-                    return false;
-                }
+                shareApp(); // Call the new share method
+                return true;
             } else if (id == R.id.patientaboutus) {
                 showinformationDialog();
                 return true;
@@ -475,6 +640,100 @@ public class patientdashboard extends AppCompatActivity {
             }
             return false;
         });
+
+    }
+
+    private void shareApp() {
+        try {
+            ApplicationInfo app = getApplicationContext().getApplicationInfo();
+            String filePath = app.sourceDir;
+            File originalApk = new File(filePath);
+
+            if (originalApk.exists()) {
+                // Create a copy in external files directory
+                File externalDir = new File(getExternalFilesDir(null), "shared_apk");
+                if (!externalDir.exists()) {
+                    externalDir.mkdirs();
+                }
+
+                // Create APK file with proper name
+                File copiedApk = new File(externalDir, "AarogyaNidaan_v" + getVersionName() + ".apk");
+
+                // Copy the APK file
+                if (copyApkFile(originalApk, copiedApk)) {
+                    // Use FileProvider to share
+                    Uri apkUri = FileProvider.getUriForFile(this,
+                            getPackageName() + ".fileprovider", copiedApk);
+
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("application/vnd.android.package-archive");
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, apkUri);
+                    shareIntent.putExtra(Intent.EXTRA_SUBJECT, " Aarogya Nidaan");
+                    shareIntent.putExtra(Intent.EXTRA_TEXT,
+                            "🎵 Aarogya Nidaan\n\n" +
+                                    "📱 Install the attached APK file\n" +
+                                    "⚠️ You may need to enable 'Install from Unknown Sources' in your device settings\n\n" +
+                                    "Developed with ❤ Passion by Nayan Pote\n" +
+                                    "File: " + copiedApk.getName());
+
+                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    shareIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+                    startActivity(Intent.createChooser(shareIntent, "Share Aarogya Nidaan APK"));
+                    showCustomToast("Sharing Aarogya Nidaan APK file...");
+                } else {
+                    showCustomToast("Failed to prepare APK file for sharing");
+                }
+            } else {
+                showCustomToast("APK file not found");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showCustomToast("Unable to share app file: " + e.getMessage());
+        }
+    }
+
+    private boolean copyApkFile(File source, File destination) {
+        try {
+            // Delete existing file if it exists
+            if (destination.exists()) {
+                destination.delete();
+            }
+
+            FileInputStream inStream = new FileInputStream(source);
+            FileOutputStream outStream = new FileOutputStream(destination);
+
+            byte[] buffer = new byte[8192]; // 8KB buffer for better performance
+            int bytesRead;
+
+            while ((bytesRead = inStream.read(buffer)) != -1) {
+                outStream.write(buffer, 0, bytesRead);
+            }
+
+            inStream.close();
+            outStream.close();
+
+            // Verify the copy was successful
+            return destination.exists() && destination.length() > 0;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private String getVersionName() {
+        try {
+            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            return packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            return "1.0";
+        }
+    }
+
+    private void showCustomToast(String message) {
+        Toast toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     private void showinformationDialog() {
@@ -673,5 +932,4 @@ public class patientdashboard extends AppCompatActivity {
         binding = null;
         super.onDestroy(); // Call once at the end
     }
-
 }

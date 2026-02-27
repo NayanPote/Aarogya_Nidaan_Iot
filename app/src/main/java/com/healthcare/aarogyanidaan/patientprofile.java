@@ -34,6 +34,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+// Import the generated binding class
+import com.healthcare.aarogyanidaan.databinding.ActivityPatientprofileBinding;
+import com.healthcare.aarogyanidaan.databinding.ActivityPatientEditProfileBinding;
+import com.healthcare.aarogyanidaan.databinding.DialogReauthBinding;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -44,44 +49,36 @@ import java.util.Map;
 
 public class patientprofile extends AppCompatActivity {
 
+    // View Binding
+    private ActivityPatientprofileBinding binding;
+
     private FirebaseAuth auth;
     private DatabaseReference reference;
     private DatabaseReference chatRequestsRef;
     private DatabaseReference conversationsRef;
-    private TextView patientId, patientName, patientEmail, patientPhone,
-            patientGender, patientCity, patientDob;
     private SimpleDateFormat dateFormatter;
     private String selectedGender = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_patientprofile);
+
+        // Initialize View Binding
+        binding = ActivityPatientprofileBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         dateFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
-        initializeUIComponents();
         setupFirebase();
         setupListeners();
+        setupClickListeners();
     }
 
-    private void initializeUIComponents() {
-        patientId = findViewById(R.id.patientid);
-        patientName = findViewById(R.id.patientname);
-        patientEmail = findViewById(R.id.patientemail);
-        patientPhone = findViewById(R.id.patientphone);
-        patientGender = findViewById(R.id.patientgender);
-        patientCity = findViewById(R.id.patientcity);
-        patientDob = findViewById(R.id.patientdob);
-        ImageButton editButton = findViewById(R.id.editbutton);
-        ImageButton backButton = findViewById(R.id.backbutton);
-        ImageButton copyPatientId = findViewById(R.id.copypatientid);
-        Button patientdeleteprofile = findViewById(R.id.patientdeleteprofile);
-
-        editButton.setOnClickListener(v -> showEditDialog());
-        backButton.setOnClickListener(v -> onBackPressed());
-        patientdeleteprofile.setOnClickListener(v -> showDeleteDialog());
-        copyPatientId.setOnClickListener(v -> copyToClipboard(patientId.getText().toString()));
+    private void setupClickListeners() {
+        binding.editbutton.setOnClickListener(v -> showEditDialog());
+        binding.backButton.setOnClickListener(v -> onBackPressed());
+        binding.patientdeleteprofile.setOnClickListener(v -> showDeleteDialog());
+        binding.copypatientid.setOnClickListener(v -> copyToClipboard(binding.patientid.getText().toString()));
     }
 
     private void copyToClipboard(String patientId) {
@@ -108,11 +105,8 @@ public class patientprofile extends AppCompatActivity {
 
     private void showReAuthenticationForDelete() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_reauth, null);
-        builder.setView(dialogView);
-
-        final EditText passwordInput = dialogView.findViewById(R.id.password_input);
+        DialogReauthBinding dialogBinding = DialogReauthBinding.inflate(getLayoutInflater());
+        builder.setView(dialogBinding.getRoot());
 
         AlertDialog dialog = builder.setTitle("Re-authenticate")
                 .setMessage("Please enter your current password to delete account")
@@ -123,9 +117,9 @@ public class patientprofile extends AppCompatActivity {
         dialog.setOnShowListener(dialogInterface -> {
             Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             button.setOnClickListener(view -> {
-                String password = passwordInput.getText().toString();
+                String password = dialogBinding.passwordInput.getText().toString();
                 if (TextUtils.isEmpty(password)) {
-                    passwordInput.setError("Password required");
+                    dialogBinding.passwordInput.setError("Password required");
                     return;
                 }
 
@@ -219,6 +213,7 @@ public class patientprofile extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> handleDeletionError(e, progressDialog));
     }
+
     private void handleDeletionError(Exception e, ProgressDialog progressDialog) {
         progressDialog.dismiss();
         Toast.makeText(patientprofile.this,
@@ -235,39 +230,31 @@ public class patientprofile extends AppCompatActivity {
 
     private void showEditDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.activity_patient_edit_profile, null);
-        builder.setView(dialogView);
-
-        EditText editName = dialogView.findViewById(R.id.editpatientname);
-        TextView editEmail = dialogView.findViewById(R.id.editpatientemail);
-        EditText editPhone = dialogView.findViewById(R.id.editpatientphone);
-        EditText editCity = dialogView.findViewById(R.id.editpatientcity);
-        EditText editDob = dialogView.findViewById(R.id.editpatientdob);
-        RadioGroup editGender = dialogView.findViewById(R.id.editpatientgender);
+        ActivityPatientEditProfileBinding editBinding = ActivityPatientEditProfileBinding.inflate(getLayoutInflater());
+        builder.setView(editBinding.getRoot());
 
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    editName.setText(snapshot.child("patient_name").getValue(String.class));
-                    editEmail.setText(snapshot.child("patient_email").getValue(String.class));
-                    editPhone.setText(snapshot.child("patient_contactno").getValue(String.class));
-                    editCity.setText(snapshot.child("patient_city").getValue(String.class));
-                    editDob.setText(snapshot.child("patient_dob").getValue(String.class));
+                    editBinding.editpatientname.setText(snapshot.child("patient_name").getValue(String.class));
+                    editBinding.editpatientemail.setText(snapshot.child("patient_email").getValue(String.class));
+                    editBinding.editpatientphone.setText(snapshot.child("patient_contactno").getValue(String.class));
+                    editBinding.editpatientcity.setText(snapshot.child("patient_city").getValue(String.class));
+                    editBinding.editpatientdob.setText(snapshot.child("patient_dob").getValue(String.class));
 
                     String gender = snapshot.child("patient_gender").getValue(String.class);
                     if (gender != null) {
                         selectedGender = gender;
                         switch (gender) {
                             case "Male":
-                                editGender.check(R.id.rb_pmale);
+                                editBinding.editpatientgender.check(R.id.rb_pmale);
                                 break;
                             case "Female":
-                                editGender.check(R.id.rb_pfemale);
+                                editBinding.editpatientgender.check(R.id.rb_pfemale);
                                 break;
                             case "Other":
-                                editGender.check(R.id.rb_pother);
+                                editBinding.editpatientgender.check(R.id.rb_pother);
                                 break;
                         }
                     }
@@ -282,10 +269,10 @@ public class patientprofile extends AppCompatActivity {
             }
         });
 
-        editDob.setKeyListener(null);
-        editDob.setOnClickListener(v -> showDatePicker(editDob));
+        editBinding.editpatientdob.setKeyListener(null);
+        editBinding.editpatientdob.setOnClickListener(v -> showDatePicker(editBinding.editpatientdob));
 
-        editGender.setOnCheckedChangeListener((group, checkedId) -> {
+        editBinding.editpatientgender.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.rb_pmale) {
                 selectedGender = "Male";
             } else if (checkedId == R.id.rb_pfemale) {
@@ -302,12 +289,13 @@ public class patientprofile extends AppCompatActivity {
 
         dialog.setOnShowListener(dialogInterface -> {
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-                if (validateData(editName, editPhone, editCity, editDob)) {
+                if (validateData(editBinding.editpatientname, editBinding.editpatientphone,
+                        editBinding.editpatientcity, editBinding.editpatientdob)) {
                     Map<String, Object> updates = new HashMap<>();
-                    updates.put("patient_name", editName.getText().toString().trim());
-                    updates.put("patient_contactno", editPhone.getText().toString().trim());
-                    updates.put("patient_city", editCity.getText().toString().trim());
-                    updates.put("patient_dob", editDob.getText().toString().trim());
+                    updates.put("patient_name", editBinding.editpatientname.getText().toString().trim());
+                    updates.put("patient_contactno", editBinding.editpatientphone.getText().toString().trim());
+                    updates.put("patient_city", editBinding.editpatientcity.getText().toString().trim());
+                    updates.put("patient_dob", editBinding.editpatientdob.getText().toString().trim());
                     updates.put("patient_gender", selectedGender);
 
                     savePatientData(updates);
@@ -447,11 +435,8 @@ public class patientprofile extends AppCompatActivity {
 
     private void showReAuthenticationDialog(String newEmail, Map<String, Object> patientData) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_reauth, null);
-        builder.setView(dialogView);
-
-        final EditText passwordInput = dialogView.findViewById(R.id.password_input);
+        DialogReauthBinding dialogBinding = DialogReauthBinding.inflate(getLayoutInflater());
+        builder.setView(dialogBinding.getRoot());
 
         AlertDialog dialog = builder.setTitle("Re-authenticate")
                 .setMessage("Please enter your current password to update email")
@@ -462,9 +447,9 @@ public class patientprofile extends AppCompatActivity {
         dialog.setOnShowListener(dialogInterface -> {
             Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             button.setOnClickListener(view -> {
-                String password = passwordInput.getText().toString();
+                String password = dialogBinding.passwordInput.getText().toString();
                 if (TextUtils.isEmpty(password)) {
-                    passwordInput.setError("Password required");
+                    dialogBinding.passwordInput.setError("Password required");
                     return;
                 }
 
@@ -543,13 +528,13 @@ public class patientprofile extends AppCompatActivity {
         String city = snapshot.child("patient_city").getValue(String.class);
         String dob = snapshot.child("patient_dob").getValue(String.class);
 
-        patientId.setText(id != null ? id : "Not set");
-        patientName.setText(name != null ? name : "Not set");
-        patientEmail.setText(email != null ? email : "Not set");
-        patientPhone.setText(phone != null ? phone : "Not set");
-        patientGender.setText(gender != null ? gender : "Not set");
-        patientCity.setText(city != null ? city : "Not set");
-        patientDob.setText(dob != null ? dob : "Not set");
+        binding.patientid.setText(id != null ? id : "Not set");
+        binding.patientname.setText(name != null ? name : "Not set");
+        binding.patientemail.setText(email != null ? email : "Not set");
+        binding.patientphone.setText(phone != null ? phone : "Not set");
+        binding.patientgender.setText(gender != null ? gender : "Not set");
+        binding.patientcity.setText(city != null ? city : "Not set");
+        binding.patientdob.setText(dob != null ? dob : "Not set");
     }
 
     @Override
@@ -558,5 +543,12 @@ public class patientprofile extends AppCompatActivity {
         if (auth.getCurrentUser() != null) {
             setupListeners();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Clean up binding to prevent memory leaks
+        binding = null;
     }
 }

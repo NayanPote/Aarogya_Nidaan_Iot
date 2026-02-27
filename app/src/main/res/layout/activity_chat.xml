@@ -3,15 +3,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#A6ACB4">
+    xmlns:tool="http://schemas.android.com/tools"
+    android:background="@color/background_light"
+    tool:context=".ChatActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/main_dark"
-        android:elevation="4dp"
-        app:contentInsetStart="0dp">
+        android:background="@color/background_light"
+        app:contentInsetStart="0dp"
+        app:layout_scrollFlags="scroll|enterAlways|snap"
+        android:elevation="4dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -28,7 +31,7 @@
                 android:contentDescription="Back"
                 android:padding="12dp"
                 android:src="@drawable/back"
-                app:tint="@color/white"
+                app:tint="@color/main_dark"
                 android:layout_marginStart="10dp" />
 
             <!-- Name and Status -->
@@ -43,7 +46,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Name"
-                    android:textColor="@color/white"
+                    android:textColor="@color/main_dark"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -52,36 +55,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Online"
-                     android:visibility="gone"
-                    android:textColor="#E0E0E0"
+                     android:visibility="visible"
+                    android:textColor="@color/oxygen_green"
                     android:textSize="12sp" />
-            </LinearLayout>
-
-            <!-- Health Data Section -->
-            <LinearLayout
-                android:id="@+id/container"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ImageButton
-                    android:id="@+id/healthDataButton"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Health Info"
-                    android:padding="12dp"
-                    android:src="@drawable/healthinfo" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:text="Health Data"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
             </LinearLayout>
 
             <ImageButton
@@ -93,7 +69,8 @@
                 android:padding="12dp"
                 android:src="@drawable/threedots"
                 android:layout_gravity="end|center_vertical"
-                android:layout_marginEnd="10dp" />
+                android:layout_marginEnd="10dp"
+                app:tint="@color/main_dark" />
         </LinearLayout>
     </androidx.appcompat.widget.Toolbar>
 
@@ -125,58 +102,66 @@
         android:layout_gravity="bottom"
         android:layout_margin="6dp">
 
-        <LinearLayout
-            android:id="@+id/bottomLayout"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/bottomCardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
-            android:background="@drawable/floating_background"
-            android:orientation="horizontal"
-            android:padding="12dp"
-            android:elevation="8dp"
-            android:layout_marginBottom="16dp">
-
-            <ImageButton
-                android:id="@+id/camera"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="4dp"
-                android:background="@drawable/send_button"
-                android:src="@drawable/camera" />
+            android:layout_marginBottom="6dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="6dp">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:id="@+id/bottomLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/chatbox"
                 android:orientation="horizontal"
+                android:background="@drawable/logobackground_gradient"
                 android:padding="12dp">
 
-                <EditText
-                    android:id="@+id/messageInput"
+                <ImageButton
+                    android:id="@+id/healthDataButton"
+                    android:layout_width="48dp"
+                    android:layout_height="46dp"
+                    android:layout_marginEnd="4dp"
+                    android:src="@drawable/healthinfo"
+                    android:background="@android:color/transparent" />
+
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="Type a message..."
-                    android:background="@color/transparent"
-                    android:maxLines="4"/>
+                    android:orientation="horizontal"
+                    android:background="@drawable/chatbox"
+                    android:padding="12dp">
+
+                    <EditText
+                        android:id="@+id/messageInput"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="Type a message..."
+                        android:background="@android:color/transparent"
+                        android:maxLines="4" />
+
+<!--                    <ImageButton-->
+<!--                        android:id="@+id/upload"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:src="@drawable/upload"-->
+<!--                        android:background="@android:color/transparent" />-->
+                </LinearLayout>
 
                 <ImageButton
-                    android:id="@+id/upload"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/upload"
-                    android:background="@color/transparent"/>
+                    android:id="@+id/sendButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="4dp"
+                    android:background="@drawable/send_button"
+                    android:src="@drawable/send" />
             </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-            <ImageButton
-                android:id="@+id/sendButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="4dp"
-                android:background="@drawable/send_button"
-                android:src="@drawable/send"/>
-        </LinearLayout>
     </FrameLayout>
 
 </RelativeLayout>

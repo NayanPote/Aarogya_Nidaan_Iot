@@ -1,133 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_light">
+    android:background="@color/background_light"
+    android:fitsSystemWindows="true"
+    tools:context=".patientchat">
 
+    <!-- Simple App Bar -->
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:elevation="8dp">
+        android:layout_height="wrap_content">
 
+        <!-- Simple Toolbar -->
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/main_dark"
-            android:elevation="4dp"
-            app:contentInsetStartWithNavigation="0dp"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+            android:background="@color/background_light"
+            app:contentInsetStart="0dp"
+            app:layout_scrollFlags="scroll|enterAlways|snap">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:paddingStart="8dp"
+                android:paddingEnd="16dp">
 
+                <!-- Back Button -->
                 <ImageButton
                     android:id="@+id/backbutton"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:src="@drawable/backbutton"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:padding="8dp"
-                    app:tint="@color/white" />
+                    android:contentDescription="Navigate back"
+                    android:padding="12dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/backbutton"/>
 
-                <androidx.appcompat.widget.SearchView
-                    android:id="@+id/patsearch_bar"
+                <!-- Search Section -->
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginStart="2dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/search_background"
-                    android:textColor="@color/white"
-                    app:queryHint="Search conversations..."
-                    app:iconifiedByDefault="false"
-                    app:queryBackground="@android:color/transparent"
-                    app:searchIcon="@drawable/ic_search"
-                    app:closeIcon="@drawable/ic_close"
-                    app:tint="@color/white"/>
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:background="@drawable/border_background">
+
+                    <!-- SearchView -->
+                    <androidx.appcompat.widget.SearchView
+                        android:id="@+id/patsearch_bar"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        app:closeIcon="@null"
+                        app:iconifiedByDefault="false"
+                        app:queryBackground="@android:color/transparent"
+                        app:queryHint="Search conversations..."
+                        app:searchHintIcon="@null"
+                        app:searchIcon="@drawable/ic_search"
+                        app:submitBackground="@android:color/transparent" />
+                </LinearLayout>
+
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Content area with RecyclerView -->
+    <!-- Main Content Area -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <FrameLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@color/background_light">
 
+            <!-- Conversations RecyclerView -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/conversationsRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@color/background_light"
                 android:clipToPadding="false"
-                android:background="@drawable/patient_card_gradient_background"
+                android:overScrollMode="never"
+                android:paddingHorizontal="12dp"
+                tools:listitem="@layout/item_doctor_convertation"
                 android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                android:scrollbars="none"/>
+                android:paddingBottom="24dp"
+                android:scrollbars="none" />
 
+            <!-- Loading Progress Bar -->
             <ProgressBar
                 android:id="@+id/progressBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
+                android:indeterminate="true"
                 android:visibility="gone" />
 
-            <!-- Empty state view -->
+            <!-- Enhanced Empty State -->
             <LinearLayout
                 android:id="@+id/emptyStateView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="vertical"
+                android:paddingHorizontal="32dp"
+                android:paddingVertical="48dp"
                 android:visibility="gone">
 
-                <ImageView
+                <!-- Empty State Icon Container -->
+                <androidx.cardview.widget.CardView
                     android:layout_width="120dp"
                     android:layout_height="120dp"
-                    android:src="@drawable/ic_empty_conversations"
-                    android:contentDescription="No conversations"
-                    android:alpha="0.5"/>
+                    app:cardBackgroundColor="#F8F9FA"
+                    app:cardCornerRadius="60dp"
+                    app:cardElevation="0dp">
 
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="No conversations"
+                        android:src="@drawable/ic_empty_conversations"
+                        app:tint="@color/text_tertiary" />
+                </androidx.cardview.widget.CardView>
+
+                <!-- Empty State Text -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:fontFamily="@font/latoregular"
                     android:text="No conversations yet"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="16dp"
-                    android:textColor="@color/text_secondary"/>
+                    android:textColor="@color/text_secondary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Your conversations with doctors will appear here"
-                    android:textSize="14sp"
-                    android:layout_marginTop="8dp"
-                    android:textColor="@color/text_tertiary"/>
+                    android:layout_marginTop="12dp"
+                    android:layout_marginHorizontal="24dp"
+                    android:lineSpacingExtra="4dp"
+                    android:text="Your conversations with doctors will appear here. Start a conversation to get medical assistance."
+                    android:textAlignment="center"
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="16sp" />
+
             </LinearLayout>
-        </FrameLayout>
+        </RelativeLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-    <!-- Add floating action button to start a new conversation (optional) -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabNewMessage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="25dp"
-        android:src="@drawable/ic_message"
-        app:backgroundTint="@color/accent_color"
-        app:tint="@color/white"
-        android:contentDescription="New message"/>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
