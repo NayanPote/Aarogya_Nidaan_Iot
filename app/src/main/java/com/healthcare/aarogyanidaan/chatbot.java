@@ -64,6 +64,10 @@ public class chatbot extends AppCompatActivity {
     private static final int STORAGE_PERMISSION_CODE = 101;
     private static final int CAMERA_REQUEST_CODE = 102;
     private static final int GALLERY_REQUEST_CODE = 103;
+
+    // Replace with your actual Gemini API key
+    private static final String GEMINI_API_KEY = "AIzaSyAQCfBdSwupNXVDIc9Qobp1GaVhT1wb5UI";
+
     private RecyclerView chatRecyclerView;
     private EditText messageEditText;
     private ImageButton sendButton, backbutton;
@@ -71,7 +75,11 @@ public class chatbot extends AppCompatActivity {
     private List<ChatMessage> chatMessages;
     private ChatAdapter chatAdapter;
 
-    // Health knowledge base
+    // Gemini API Helper
+    private GeminiApiHelper geminiHelper;
+    private boolean useAI = true; // Toggle for AI vs local responses
+
+    // Health knowledge base (fallback when API fails)
     private Map<String, List<String>> healthResponses;
     private List<String> generalGreetings;
     private List<String> unknownResponses;
@@ -112,18 +120,18 @@ public class chatbot extends AppCompatActivity {
         // Initialize the database helper
         dbHelper = new ChatDatabaseHelper(this);
 
+        // Initialize Gemini API Helper
+        geminiHelper = new GeminiApiHelper(this, GEMINI_API_KEY);
+
         // Load previous messages
         loadChatHistory();
 
         camera.setOnClickListener(v -> openCamera());
         upload.setOnClickListener(v -> openGallery());
 
-        // Initialize knowledge bases
+        // Initialize knowledge bases (for fallback)
         initializeKnowledgeBase();
         addDateMessage();
-
-        // Send welcome message
-//        addBotMessage("Hello! I'm Aarogya Assist, your personal health assistant. I was created by Nayan Pote to help you with health-related questions and general discussions. How can I help you today?");
 
         // Setup send button click listener
         sendButton.setOnClickListener(new View.OnClickListener() {
@@ -135,40 +143,43 @@ public class chatbot extends AppCompatActivity {
                 }
             }
         });
+
         ImageButton menuButton = findViewById(R.id.menuButton);
         menuButton.setOnClickListener(this::showPopupMenu);
+
         backbutton.setOnClickListener(view -> {
             onBackPressed();
             finish();
         });
     }
 
-    private void loadChatHistory() {
-        chatMessages.clear(); // Clear existing chat list
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (geminiHelper != null) {
+            geminiHelper.shutdown();
+        }
+    }
 
-        // Load all messages from the database
+    private void loadChatHistory() {
+        chatMessages.clear();
         List<ChatMessage> messages = dbHelper.getAllMessages();
 
-        //  Get today's date in the correct format
         String todayDate = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(new Date());
         boolean todayDateExists = dbHelper.todayDateSeparatorExists(todayDate);
 
-        //  If no messages or no date separator for today exists, add one
         if (messages.isEmpty() || !todayDateExists) {
             ChatMessage dateMessage = new ChatMessage("", todayDate, "");
             dateMessage.sentBy = ChatMessage.DATE_SEPARATOR;
 
-            //  Save to database only if it doesn't exist
             if (!todayDateExists) {
                 dbHelper.addDateSeparator(dateMessage);
             }
         }
 
-        //  Add all messages from database to our chat list (including date separator)
         chatMessages.addAll(messages);
         chatAdapter.notifyDataSetChanged();
 
-        //  Check if there are any non-separator messages
         boolean onlyDateSeparator = true;
         for (ChatMessage msg : chatMessages) {
             if (msg.sentBy != ChatMessage.DATE_SEPARATOR) {
@@ -178,30 +189,23 @@ public class chatbot extends AppCompatActivity {
         }
 
         if (onlyDateSeparator) {
-            //  Send welcome message if only date separator exists
-            addBotMessage("Hello! I'm Aarogya Assist, your personal health assistant. " +
-                    "I was created by Nayan Pote to help you with health-related questions and general discussions. " +
+            addBotMessage("Hello! I'm Aarogya Assist, your AI-powered health assistant. " +
+                    "I was created by Nayan Pote to help you with health-related questions and wellness guidance. " +
                     "How can I help you today?");
         } else {
-            //  Scroll to the latest message if messages exist
             chatRecyclerView.post(() -> chatRecyclerView.scrollToPosition(chatMessages.size() - 1));
         }
     }
 
-    // Update the addUserMessage method to save to database
     private void addUserMessage(String message) {
         ChatMessage chatMessage = new ChatMessage("user", message, getCurrentTime());
         chatMessages.add(chatMessage);
         chatAdapter.notifyItemInserted(chatMessages.size() - 1);
         scrollToBottom();
-
-        // Save to database
         dbHelper.addMessage(chatMessage);
     }
 
-    // Update the addBotMessage method to save to database
     private void addBotMessage(String message) {
-        // Simulate typing delay
         sendButton.setEnabled(false);
 
         new android.os.Handler().postDelayed(new Runnable() {
@@ -212,27 +216,20 @@ public class chatbot extends AppCompatActivity {
                 chatAdapter.notifyItemInserted(chatMessages.size() - 1);
                 scrollToBottom();
                 sendButton.setEnabled(true);
-
-                // Save to database
                 dbHelper.addMessage(chatMessage);
             }
-        }, 500); // 500ms delay to simulate typing
+        }, 500);
     }
-
 
     private void addDateMessage() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
         String dateString = dateFormat.format(new Date());
 
-        // Create a date separator message
         ChatMessage dateMessage = new ChatMessage("", dateString, "");
         dateMessage.sentBy = ChatMessage.DATE_SEPARATOR;
 
-        // Add to chat list and notify adapter
         chatMessages.add(dateMessage);
         chatAdapter.notifyItemInserted(chatMessages.size() - 1);
-
-        // Save to database with special type
         dbHelper.addDateSeparator(dateMessage);
     }
 
@@ -243,8 +240,7 @@ public class chatbot extends AppCompatActivity {
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
-                Toast.makeText(this, "Error creating image file",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Error creating image file", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -263,11 +259,7 @@ public class chatbot extends AppCompatActivity {
                 Locale.getDefault()).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,
-                ".jpg",
-                storageDir
-        );
+        File image = File.createTempFile(imageFileName, ".jpg", storageDir);
         currentPhotoPath = image.getAbsolutePath();
         return image;
     }
@@ -275,8 +267,8 @@ public class chatbot extends AppCompatActivity {
     private void checkPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this
-                    , new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
         }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -287,8 +279,6 @@ public class chatbot extends AppCompatActivity {
                     STORAGE_PERMISSION_CODE);
         }
     }
-
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -325,15 +315,11 @@ public class chatbot extends AppCompatActivity {
         chatMessages.add(chatMessage);
         chatAdapter.notifyItemInserted(chatMessages.size() - 1);
         scrollToBottom();
-
-        // Save to database
         dbHelper.addMessage(chatMessage);
 
-        // Generate a response for media
-        String response = "I received your " + (caption.contains("Photo") ? "photo" : "image") +
-                ". Would you like to discuss anything about it?";
+        String response = "I can see you've shared an image. While I can't analyze images directly yet, " +
+                "feel free to describe what's in the image or ask me any health-related questions about it!";
 
-        // Add bot response
         new android.os.Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -341,13 +327,10 @@ public class chatbot extends AppCompatActivity {
                 chatMessages.add(botMessage);
                 chatAdapter.notifyItemInserted(chatMessages.size() - 1);
                 scrollToBottom();
-
-                // Save to database
                 dbHelper.addMessage(botMessage);
             }
         }, 500);
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
@@ -356,19 +339,15 @@ public class chatbot extends AppCompatActivity {
 
         if (requestCode == CAMERA_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Camera permission granted",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Camera permission granted", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "Camera permission denied",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show();
             }
         } else if (requestCode == STORAGE_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Storage permission granted",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Storage permission granted", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "Storage permission denied",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Storage permission denied", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -389,12 +368,10 @@ public class chatbot extends AppCompatActivity {
             if (id == R.id.menu_clear_chat) {
                 showClearChatConfirmation();
                 return true;
-            }
-            else if (id == R.id.menu_settings) {
+            } else if (id == R.id.menu_settings) {
                 openSettings();
                 return true;
-            }
-            else if (id == R.id.menu_help) {
+            } else if (id == R.id.menu_help) {
                 showHelpDialog();
                 return true;
             }
@@ -406,19 +383,34 @@ public class chatbot extends AppCompatActivity {
     }
 
     private void openSettings() {
-        Toast.makeText(this, "Settings feature coming soon", Toast.LENGTH_SHORT).show();
+        // Create dialog to toggle AI mode
+        new AlertDialog.Builder(this)
+                .setTitle("Chatbot Settings")
+                .setMessage("Choose response mode:")
+                .setPositiveButton("AI Mode (Gemini)", (dialog, which) -> {
+                    useAI = true;
+                    Toast.makeText(this, "AI Mode Enabled", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Local Mode", (dialog, which) -> {
+                    useAI = false;
+                    Toast.makeText(this, "Local Mode Enabled", Toast.LENGTH_SHORT).show();
+                })
+                .setNeutralButton("Cancel", null)
+                .show();
     }
 
     private void showHelpDialog() {
         new AlertDialog.Builder(this)
-                .setTitle("Chatbot Assistant")
+                .setTitle("Aarogya Assist - AI Health Assistant")
                 .setIcon(R.drawable.chatbot)
-                .setMessage("This chatbot can help with:\n\n" +
-                        "• 💡 Answering general questions\n\n" +
-                        "• 💬 Having friendly conversations\n\n" +
-                        "• 🧠 Providing basic health information\n\n" +
-                        "• 🌟 Offering daily wellness tips\n\n" +
-                        "Try asking about exercise, diet, sleep, or stress management.")
+                .setMessage("I'm an AI-powered health assistant that can help with:\n\n" +
+                        "• 🤖 Intelligent health conversations\n\n" +
+                        "• 💊 General health information\n\n" +
+                        "• 🏃 Exercise and fitness guidance\n\n" +
+                        "• 🥗 Nutrition and diet advice\n\n" +
+                        "• 😴 Sleep and stress management\n\n" +
+                        "• 🩺 Symptom assessment (general guidance only)\n\n" +
+                        "Note: I provide general information and am not a substitute for professional medical advice.")
                 .setPositiveButton("OK", null)
                 .show();
     }
@@ -428,16 +420,18 @@ public class chatbot extends AppCompatActivity {
                 .setTitle("Clear Chat History")
                 .setMessage("Are you sure you want to clear all chat history? This cannot be undone.")
                 .setPositiveButton("Clear", (dialog, which) -> {
-                    // Clear the database
                     dbHelper.clearAllMessages();
-
-                    // Clear the list
                     chatMessages.clear();
                     chatAdapter.notifyDataSetChanged();
 
-                    // Add welcome message again
+                    // Clear Gemini conversation history
+                    if (geminiHelper != null) {
+                        geminiHelper.clearHistory();
+                    }
+
                     addDateMessage();
-                    addBotMessage("Hello! I'm Aarogya Assist, your personal health assistant. I was created by Nayan Pote to help you with health-related questions and general discussions. How can I help you today?");
+                    addBotMessage("Hello! I'm Aarogya Assist, your AI-powered health assistant. " +
+                            "How can I help you today?");
 
                     Toast.makeText(this, "Chat history cleared", Toast.LENGTH_SHORT).show();
                 })
@@ -446,24 +440,21 @@ public class chatbot extends AppCompatActivity {
     }
 
     private void initializeKnowledgeBase() {
-        // Initialize health responses
+        // Initialize health responses (fallback)
         healthResponses = new HashMap<>();
 
-        // Greetings
         generalGreetings = new ArrayList<>();
         generalGreetings.add("Hello! How can I assist you with your health today?");
         generalGreetings.add("Hi there! I'm Aarogya Assist. What health questions do you have?");
         generalGreetings.add("Greetings! I'm here to help with any health concerns or questions.");
         generalGreetings.add("Welcome! How can I help you stay healthy today?");
 
-        // Unknown responses
         unknownResponses = new ArrayList<>();
         unknownResponses.add("I'm not sure I understand. Could you rephrase that?");
         unknownResponses.add("I'm still learning. Can you ask that in a different way?");
         unknownResponses.add("I don't have information on that yet. Can I help with something else?");
         unknownResponses.add("I'm not programmed to understand that query. Could you try another question?");
 
-        // Common health topics
         List<String> exerciseResponses = new ArrayList<>();
         exerciseResponses.add("Regular exercise is crucial for maintaining good health. Aim for at least 150 minutes of moderate activity per week.");
         exerciseResponses.add("Exercise benefits include improved cardiovascular health, better mood, and reduced risk of chronic diseases.");
@@ -488,7 +479,6 @@ public class chatbot extends AppCompatActivity {
         stressResponses.add("If stress is severely impacting your daily life, consider speaking with a healthcare professional.");
         healthResponses.put("stress", stressResponses);
 
-        // Symptom questions for consultation
         symptomQuestions = new ArrayList<>();
         symptomQuestions.add("How long have you been experiencing these symptoms?");
         symptomQuestions.add("On a scale of 1-10, how would you rate any pain associated with this?");
@@ -496,7 +486,6 @@ public class chatbot extends AppCompatActivity {
         symptomQuestions.add("Are you currently taking any medications?");
         symptomQuestions.add("Have you made any recent lifestyle changes?");
 
-        // Common medical conditions info
         medicalConditions = new HashMap<>();
 
         List<String> feverInfo = new ArrayList<>();
@@ -526,45 +515,79 @@ public class chatbot extends AppCompatActivity {
     }
 
     private void sendMessage(String message) {
-        // Add user message to chat
         addUserMessage(message);
-
-        // Clear input field
         messageEditText.setText("");
 
-        // Process message and generate response
-        String response = processUserMessage(message);
+        // Check for emergency keywords first
+        String lowerMessage = message.toLowerCase();
+        if (isEmergency(lowerMessage)) {
+            String emergencyResponse = "⚠️ This sounds like a medical emergency! Please call emergency services immediately:\n\n" +
+                    "🚨 India: 102 (Ambulance) or 108 (Emergency)\n" +
+                    "🚨 USA: 911\n" +
+                    "🚨 UK: 999\n\n" +
+                    "Don't wait for online advice in emergency situations. Get help NOW!";
+            addBotMessage(emergencyResponse);
+            return;
+        }
 
-        // Add bot response to chat
-        addBotMessage(response);
+        // Use AI if enabled, otherwise use local responses
+        if (useAI) {
+            // Show typing indicator
+            sendButton.setEnabled(false);
+
+            geminiHelper.generateResponse(message, new GeminiApiHelper.GeminiCallback() {
+                @Override
+                public void onSuccess(String response) {
+                    runOnUiThread(() -> {
+                        addBotMessage(response);
+                    });
+                }
+
+                @Override
+                public void onError(String error) {
+                    runOnUiThread(() -> {
+                        Log.e("Chatbot", "Gemini API Error: " + error);
+                        // Fallback to local response
+                        String fallbackResponse = processLocalMessage(message);
+                        addBotMessage(fallbackResponse);
+                        Toast.makeText(chatbot.this, "Using local responses (API unavailable)",
+                                Toast.LENGTH_SHORT).show();
+                    });
+                }
+            });
+        } else {
+            // Use local knowledge base
+            String response = processLocalMessage(message);
+            addBotMessage(response);
+        }
     }
 
-    private String processUserMessage(String message) {
+    private boolean isEmergency(String message) {
+        String[] emergencyKeywords = {
+                "emergency", "severe pain", "heart attack", "stroke", "can't breathe",
+                "chest pain", "suicide", "kill myself", "heavy bleeding", "overdose",
+                "unconscious", "seizure", "choking", "severe bleeding"
+        };
+
+        for (String keyword : emergencyKeywords) {
+            if (message.contains(keyword)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String processLocalMessage(String message) {
         String lowerCaseMessage = message.toLowerCase();
-
-        // Check if in health consultation mode
-        if (inHealthConsultation) {
-            return handleHealthConsultation(lowerCaseMessage);
-        }
-
-        // Check for health consultation request
-        if (lowerCaseMessage.contains("not feeling well") ||
-                lowerCaseMessage.contains("feel sick") ||
-                lowerCaseMessage.contains("have symptoms") ||
-                lowerCaseMessage.contains("health concern") ||
-                lowerCaseMessage.contains("medical advice")) {
-
-            inHealthConsultation = true;
-            consultationStage = 0;
-            return "I can help assess your symptoms. Please describe what you're experiencing.";
-        }
 
         // Check for information about Aarogya Assist
         if (lowerCaseMessage.contains("who are you") ||
                 lowerCaseMessage.contains("about you") ||
                 lowerCaseMessage.contains("made you") ||
                 lowerCaseMessage.contains("created you")) {
-            return "I'm Aarogya Assist, a health assistant chatbot created by Nayan Pote. I'm designed to provide general health information and engage in conversations. I'm not a replacement for professional medical advice.";
+            return "I'm Aarogya Assist, an AI-powered health assistant created by Nayan Pote. " +
+                    "I use advanced AI to provide health information and wellness guidance. " +
+                    "Remember, I provide general information only, not medical diagnosis or treatment.";
         }
 
         // Check for greetings
@@ -579,7 +602,7 @@ public class chatbot extends AppCompatActivity {
         if (lowerCaseMessage.contains("thank") ||
                 lowerCaseMessage.contains("thanks") ||
                 lowerCaseMessage.contains("appreciate")) {
-            return "You're welcome! I'm happy to help with your health questions.";
+            return "You're welcome! I'm happy to help with your health questions. Feel free to ask me anything!";
         }
 
         // Check for farewell
@@ -587,7 +610,7 @@ public class chatbot extends AppCompatActivity {
                 lowerCaseMessage.contains("goodbye") ||
                 lowerCaseMessage.contains("see you") ||
                 lowerCaseMessage.contains("talk later")) {
-            return "Take care! Remember to prioritize your health. Feel free to chat again if you have more questions.";
+            return "Take care and stay healthy! Feel free to chat again whenever you have health questions. Goodbye! 👋";
         }
 
         // Check for common health topics
@@ -600,17 +623,9 @@ public class chatbot extends AppCompatActivity {
         // Check for medical conditions
         for (Map.Entry<String, List<String>> entry : medicalConditions.entrySet()) {
             if (lowerCaseMessage.contains(entry.getKey())) {
-                return getRandomResponse(entry.getValue()) + "\n\nPlease note that I provide general information only. Consult a healthcare professional for personalized advice.";
+                return getRandomResponse(entry.getValue()) +
+                        "\n\n⚕️ Note: I provide general information only. Please consult a healthcare professional for personalized medical advice.";
             }
-        }
-
-        // Check for emergency keywords
-        if (lowerCaseMessage.contains("emergency") ||
-                lowerCaseMessage.contains("severe pain") ||
-                lowerCaseMessage.contains("heart attack") ||
-                lowerCaseMessage.contains("stroke") ||
-                lowerCaseMessage.contains("can't breathe")) {
-            return "This sounds like a medical emergency. Please call emergency services (911/112/102) immediately or go to the nearest emergency room. Don't wait for online advice in emergency situations.";
         }
 
         // General health advice
@@ -619,92 +634,17 @@ public class chatbot extends AppCompatActivity {
                 lowerCaseMessage.contains("wellness") ||
                 lowerCaseMessage.contains("stay healthy")) {
             List<String> healthTips = new ArrayList<>();
-            healthTips.add("Stay physically active - aim for at least 30 minutes of moderate exercise most days.");
-            healthTips.add("Maintain a balanced diet rich in fruits, vegetables, whole grains, and lean proteins.");
-            healthTips.add("Stay hydrated by drinking plenty of water throughout the day.");
-            healthTips.add("Prioritize sleep - most adults need 7-9 hours of quality sleep each night.");
-            healthTips.add("Manage stress through techniques like meditation, deep breathing, or enjoyable activities.");
+            healthTips.add("💪 Stay physically active - aim for at least 30 minutes of moderate exercise most days.");
+            healthTips.add("🥗 Maintain a balanced diet rich in fruits, vegetables, whole grains, and lean proteins.");
+            healthTips.add("💧 Stay hydrated by drinking plenty of water throughout the day.");
+            healthTips.add("😴 Prioritize sleep - most adults need 7-9 hours of quality sleep each night.");
+            healthTips.add("🧘 Manage stress through techniques like meditation, deep breathing, or enjoyable activities.");
             return getRandomResponse(healthTips);
         }
 
-        // Search for possible symptoms
-        Pattern symptomPattern = Pattern.compile("(headache|fever|cough|nausea|pain|fatigue|dizzy|vomiting|rash)");
-        Matcher matcher = symptomPattern.matcher(lowerCaseMessage);
-        if (matcher.find()) {
-            String symptom = matcher.group(1);
-            inHealthConsultation = true;
-            currentSymptom = symptom;
-            reportedSymptoms.add(symptom);
-            consultationStage = 1;
-            return "I see you mentioned " + symptom + ". " + getRandomResponse(symptomQuestions);
-        }
-
-        // If nothing specific is detected, provide a general response
-        return getRandomResponse(unknownResponses);
-    }
-
-    private String handleHealthConsultation(String message) {
-        // Progress through consultation stages
-        consultationStage++;
-
-        // After gathering enough information
-        if (consultationStage >= 4) {
-            inHealthConsultation = false;
-            consultationStage = 0;
-
-            // Build response based on gathered symptoms
-            StringBuilder response = new StringBuilder();
-            response.append("Based on what you've shared about ");
-
-            if (reportedSymptoms.isEmpty()) {
-                response.append("your symptoms");
-            } else {
-                for (int i = 0; i < reportedSymptoms.size(); i++) {
-                    if (i > 0) {
-                        response.append(i == reportedSymptoms.size() - 1 ? " and " : ", ");
-                    }
-                    response.append(reportedSymptoms.get(i));
-                }
-            }
-
-            response.append(", here are some general suggestions:\n\n");
-
-            if (reportedSymptoms.contains("fever")) {
-                response.append("• For fever: Rest, stay hydrated, and consider fever reducers like acetaminophen if appropriate.\n");
-            }
-            if (reportedSymptoms.contains("headache")) {
-                response.append("• For headache: Rest in a quiet, dark room. Stay hydrated and consider appropriate pain relievers.\n");
-            }
-            if (reportedSymptoms.contains("cough")) {
-                response.append("• For cough: Stay hydrated, use cough drops if needed, and consider honey (if over 1 year old).\n");
-            }
-            if (reportedSymptoms.contains("nausea") || reportedSymptoms.contains("vomiting")) {
-                response.append("• For nausea/vomiting: Stay hydrated with small sips of clear fluids. Try bland foods when able to eat.\n");
-            }
-            if (reportedSymptoms.contains("pain")) {
-                response.append("• For pain: Rest the affected area, consider appropriate over-the-counter pain relievers.\n");
-            }
-            if (reportedSymptoms.contains("fatigue")) {
-                response.append("• For fatigue: Ensure adequate rest and sleep. Stay hydrated and maintain proper nutrition.\n");
-            }
-            if (reportedSymptoms.contains("dizzy")) {
-                response.append("• For dizziness: Sit or lie down immediately. Stay hydrated and avoid sudden movements.\n");
-            }
-            if (reportedSymptoms.contains("rash")) {
-                response.append("• For rash: Avoid scratching, use mild soap, apply cool compresses if itchy.\n");
-            }
-
-            response.append("\nImportant note: These are general suggestions only. If symptoms are severe, persistent, or concerning, please consult a healthcare professional for proper diagnosis and treatment.");
-
-            // Clear consultation data
-            reportedSymptoms.clear();
-            currentSymptom = null;
-
-            return response.toString();
-        } else {
-            // Continue gathering information
-            return getRandomResponse(symptomQuestions);
-        }
+        // If nothing specific is detected
+        return getRandomResponse(unknownResponses) +
+                " I can help with topics like exercise, nutrition, sleep, stress management, and general health information.";
     }
 
     private String getRandomResponse(List<String> responses) {
@@ -724,7 +664,6 @@ public class chatbot extends AppCompatActivity {
         return sdf.format(new Date());
     }
 
-    // ChatMessage class to store message data
     public static class ChatMessage {
         public static final int SENT_BY_USER = 0;
         public static final int SENT_BY_BOT = 1;
@@ -737,7 +676,6 @@ public class chatbot extends AppCompatActivity {
         private long timestamp;
         public int sentBy;
 
-        // Constructor for regular messages
         public ChatMessage(String sender, String message, String time) {
             this.sender = sender;
             this.message = message;
@@ -752,7 +690,6 @@ public class chatbot extends AppCompatActivity {
             }
         }
 
-        // Constructor for messages with media
         public ChatMessage(String sender, String message, String time, String mediaPath) {
             this.sender = sender;
             this.message = message;
@@ -767,7 +704,6 @@ public class chatbot extends AppCompatActivity {
             }
         }
 
-        // Constructor for date separator
         public ChatMessage(String message) {
             this.sender = "";
             this.message = message;
